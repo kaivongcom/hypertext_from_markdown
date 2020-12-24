@@ -10,10 +10,10 @@ class MyMarkdownToHypertextParser
 		markdown_obj = { text: @markdown_text, length: length }
 		if @markdown_text[1] == 'a' || element_name == false
 			@results = @markdown_text
-		elsif element_name != true
-			@results = @markdown_text.match(/^#|====/) ? header_html(markdown_obj) : wrap_html(markdown_obj, element_name)
-		else
+		elsif element_name == true
 			@results = @markdown_text.match(/^#|====/) ? header_html(markdown_obj) : paragraph_html(markdown_obj)
+		elsif element_name
+			@results = @markdown_text.match(/^#|====/) ? header_html(markdown_obj) : wrap_html(markdown_obj, element_name)
 		end
 	end
 
