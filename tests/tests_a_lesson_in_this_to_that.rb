@@ -9,29 +9,30 @@ class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 		assert_equal(expected, actual)
 	end
 
-	def test_to_html_for_h1
+	def test_for_h1
 		assert_equal_of_MyMarkdownToHypertextParser('# A First Level Header', '<h1>A First Level Header</h1>')
 	end
 
-	def test_to_html_for_h2
+	def test_for_h2
 		assert_equal_of_MyMarkdownToHypertextParser('## A Second Level Header', '<h2>A Second Level Header</h2>')
 	end
 
-	def test_to_html_for_h1_long_parse
+	def test_for_h1_long_parse
 		assert_equal_of_MyMarkdownToHypertextParser("A First Level Header\n ====================", '<h1>A First Level Header</h1>')
 	end
 
-	def test_to_html_for_p_singleline
-		paragraph = "The quick brown fox jumped over the lazy dog's back.\n"
-		assert_equal_of_MyMarkdownToHypertextParser(paragraph, "<p>The quick brown fox jumped over the lazy dog's back.</p>")
+	def test_for_paragraph
+		paragraph = "example text line for unstyled\n"
+		assert_equal_of_MyMarkdownToHypertextParser(paragraph, "<p>example text line for unstyled</p>")
 	end
 
-	def test_to_html_for_p
-		paragraph = "Now is the time for all good men to come to the aid of their country. This is just a regular paragraph.\n The quick brown fox jumped over the lazy dog's back.\n"
-		assert_equal_of_MyMarkdownToHypertextParser(paragraph, "<p>Now is the time for all good men to come to the aid of their country. This is just a regular paragraph.</p><p> The quick brown fox jumped over the lazy dog's back.</p>")
+	def test_to_only_text
+		markdown = "example text line for unstyled"
+		expected = "example text line for unstyled"
+		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected, false)
 	end
 
-	def test_to_links_only
+	def test_to_only_links
 		markdown = "[example link](/example/ 'With a Title')"
 		expected = "<a href='/example/' title=\"With a Title\">example link</a>"
 		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected, false)
@@ -43,19 +44,19 @@ class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected)
 	end
 
-	def test_to_links_full
+	def test_to_link_in_paragraph
 		markdown = "This is an [example link](http://example.com/ \"With a Title\")."
 		expected = "<p>This is an <a href='http://example.com/' title=\"With a Title\">example link</a>.</p>"
 		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected)
 	end
 
-	def test_link_inside_p_1
-		act = "<p>here is <a href='http://example.com/' title=\"With a Title\">a example link</a> to something else</p>"
+	def test_link_inside_paragraph_2
 		md = "here is [a example link](http://example.com/ \"With a Title\") to something else"
+		act = "<p>here is <a href='http://example.com/' title=\"With a Title\">a example link</a> to something else</p>"
 		assert_equal_of_MyMarkdownToHypertextParser(md, act)
 	end
 
-	def test_wrapper_p1
+	def test_wrapper_paragraph_3
 		actual = "<p>here is <a href='http://example.com/' title=\"With a Title\">a example link</a> to something else</p>"
 		md = "here is [a example link](http://example.com/ \"With a Title\") to something else"
 		assert_equal_of_MyMarkdownToHypertextParser(md, actual)
