@@ -6,7 +6,6 @@ class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 	def assert_equal_of_MyMarkdownToHypertextParser(original, html, wrapper_element=true, attr_class=false)
 		actual, expected = MyMarkdownToHypertextParser.new(original, wrapper_element, attr_class).results, html
 		# actual, expected = MyMarkdownToHypertextParser.new(original, wrapper_element).results, html
-
 		assert_equal(expected, actual)
 	end
 
@@ -35,7 +34,7 @@ class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 	def test_to_links_only
 		markdown = "[example link](/example/ 'With a Title')"
 		expected = "<a href='/example/' title=\"With a Title\">example link</a>"
-		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected)
+		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected, false)
 	end
 
 	def test_to_links_short
@@ -57,15 +56,21 @@ class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 	end
 
 	def test_wrapper_p1
-		actual = "<span class=\"line-break\">here is <a href='http://example.com/' title=\"With a Title\">a example link</a> to something else</span>"
+		actual = "<p>here is <a href='http://example.com/' title=\"With a Title\">a example link</a> to something else</p>"
 		md = "here is [a example link](http://example.com/ \"With a Title\") to something else"
-		assert_equal_of_MyMarkdownToHypertextParser(md, actual, 'span')
+		assert_equal_of_MyMarkdownToHypertextParser(md, actual)
 	end
 
 	def test_specific_class_name
-		actual = "<span class=\"line-break new-class\">here is <a href='http://example.com/' title=\"With a Title\">a example link</a> to something else</span>"
+		actual = "<p class=\"new-class\">here is <a href='http://example.com/' title=\"With a Title\">a example link</a> to something else</p>"
 		md = "here is [a example link](http://example.com/ \"With a Title\") to something else"
-		assert_equal_of_MyMarkdownToHypertextParser(md, actual, 'span', 'new-class')
+		assert_equal_of_MyMarkdownToHypertextParser(md, actual, 'p', 'new-class')
+	end
+
+	def test_emoji_class_name
+		actual = "<span class=\"emoji\"><a href='#' title=\"emoji\">🦔</a></span>"
+		md = "[🦔](# \"emoji\")"
+		assert_equal_of_MyMarkdownToHypertextParser(md, actual, 'span', 'emoji')
 	end
 
 	def test_wrapper_p2
@@ -83,7 +88,7 @@ class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 	def test_complex_link
 		act = "<a href='https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-data' title=\"Media Queries Level 5 Editor’s Draft, 21 November 2020\">CSS prefers-reduced-data media-query</a>"
 		md = "[CSS prefers-reduced-data media-query](https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-data 'Media Queries Level 5 Editor’s Draft, 21 November 2020')"
-		assert_equal_of_MyMarkdownToHypertextParser(md, act)
+		assert_equal_of_MyMarkdownToHypertextParser(md, act, false)
 	end
 
 end

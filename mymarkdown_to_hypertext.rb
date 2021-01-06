@@ -2,17 +2,21 @@
 class MyMarkdownToHypertextParser
 	attr_reader :results
 
-	def initialize(markdown_text, element_name=true, attr_class=false)
+	def initialize(markdown_text, element_name=false, attr_class=false)
 		@markdown_text = markdown_text.chomp
-		link_matches = markdown_text.match(/\[(.*)\]\((.*)\)/)
-		link_html(markdown_text, link_matches) if link_matches
+		find_links(markdown_text)
 		length = @markdown_text.scan(/\n/).count
 		markdown_obj = { text: @markdown_text, length: length }
 		@results = wrap_markdown(element_name, markdown_obj, attr_class)
 	end
 
+	def find_links(markdown_text)
+		link_matches = markdown_text.match(/\[(.*)\]\((.*)\)/)
+		link_html(markdown_text, link_matches) if link_matches
+	end
+
 	def wrap_markdown(element,markdown, attr_class)
-		if @markdown_text[1] == 'a' || element == false
+		if element == false || (element == false && @markdown_text[1] == 'a')
 			@markdown_text
 		elsif element == true
 			@markdown_text.match(/^#|====/) ? header_html(markdown) : paragraph_html(markdown, attr_class)
@@ -25,9 +29,9 @@ class MyMarkdownToHypertextParser
 		element = 'a'
 		full_link = text.match(/\[(.*)\)/)[0]
 		text = match_data[1]
-		url_data = match_data[2].split(' ')
-		link = url_data[0]
-		attr_text = url_data[1..-1].join(' ').gsub("\\",'').gsub("'",'"')
+		attr_text = match_data[2].split(' ')
+		link = attr_text[0]
+		attr_text = attr_text[1..-1].join(' ').gsub("\\",'').gsub("'",'"')
 		link_text = "<#{element} href='#{link}' title=#{attr_text}>#{text}</#{element}>"
 		@markdown_text.gsub!(full_link, link_text)
 	end
@@ -51,14 +55,11 @@ class MyMarkdownToHypertextParser
 		end
 	end
 
-	def apply_attr_class(attr_class)
-		attr_class ? " #{attr_class}" : ''
-	end
-
 	def wrap_html(obj, element_name, attr_class)
-		element_name == 'span' ? element_attr=" class=\"line-break#{apply_attr_class(attr_class)}\""  : ''
+		element_attrs = ''
+		attr_class && ['span','p'].include?(element_name) ? element_attrs=" class=\"#{attr_class}\""  : ''
 		obj[:text].split("\n").collect do |element_text|
-			"<#{element_name}#{element_attr}>#{element_text}</#{element_name}>"
+			"<#{element_name}#{element_attrs}>#{element_text}</#{element_name}>"
 		end.join
 	end
 
