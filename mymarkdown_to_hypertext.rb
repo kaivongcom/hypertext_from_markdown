@@ -2,18 +2,22 @@
 class MyMarkdownToHypertextParser
 	attr_reader :results
 
-	def initialize(markdown_text, element_name=true)
+	def initialize(markdown_text, element_name=true, attr_class=false)
 		@markdown_text = markdown_text.chomp
 		link_matches = markdown_text.match(/\[(.*)\]\((.*)\)/)
 		link_html(markdown_text, link_matches) if link_matches
 		length = @markdown_text.scan(/\n/).count
 		markdown_obj = { text: @markdown_text, length: length }
-		if @markdown_text[1] == 'a' || element_name == false
-			@results = @markdown_text
-		elsif element_name == true
-			@results = @markdown_text.match(/^#|====/) ? header_html(markdown_obj) : paragraph_html(markdown_obj)
-		elsif element_name
-			@results = @markdown_text.match(/^#|====/) ? header_html(markdown_obj) : wrap_html(markdown_obj, element_name)
+		@results = wrap_markdown(element_name, markdown_obj, attr_class)
+	end
+
+	def wrap_markdown(element,markdown, attr_class)
+		if @markdown_text[1] == 'a' || element == false
+			@markdown_text
+		elsif element == true
+			@markdown_text.match(/^#|====/) ? header_html(markdown) : paragraph_html(markdown, attr_class)
+		elsif element
+			@markdown_text.match(/^#|====/) ? header_html(markdown) : wrap_html(markdown, element, attr_class)
 		end
 	end
 
@@ -47,17 +51,19 @@ class MyMarkdownToHypertextParser
 		end
 	end
 
-	def wrap_html(obj, element_name)
-		element_name == 'span' ? element_attr=' class="line-break"' : ''
+	def apply_attr_class(attr_class)
+		attr_class ? " #{attr_class}" : ''
+	end
+
+	def wrap_html(obj, element_name, attr_class)
+		element_name == 'span' ? element_attr=" class=\"line-break#{apply_attr_class(attr_class)}\""  : ''
 		obj[:text].split("\n").collect do |element_text|
 			"<#{element_name}#{element_attr}>#{element_text}</#{element_name}>"
 		end.join
 	end
 
-	def paragraph_html(obj)
-		obj[:text].split("\n").collect do |element_text|
-			"<p>#{element_text}</p>"
-		end.join
+	def paragraph_html(obj, attr_class)
+		wrap_html(obj, 'p', attr_class)
 	end
 end
 
