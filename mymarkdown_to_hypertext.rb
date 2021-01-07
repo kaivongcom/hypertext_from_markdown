@@ -1,4 +1,4 @@
-#class ITS_NOW_HTML
+#class MarkdownIntoHypertext
 class MyMarkdownToHypertextParser
 	attr_reader :results
 
