@@ -32,7 +32,7 @@ class MyMarkdownToHypertextParser
 		attr_text = match_data[2].split(' ')
 		link = attr_text[0]
 		attr_text = attr_text[1..-1].join(' ').gsub("\\",'').gsub("'",'"')
-		link_text = "<#{element} href='#{link}' title=#{attr_text}>#{text}</#{element}>"
+		link_text = "<#{element} href=\"#{link}\" title=#{attr_text}>#{text}</#{element}>"
 		@markdown_text.gsub!(full_link, link_text)
 	end
 
