@@ -1,3 +1,5 @@
+require "builder"
+
 #class MarkdownIntoHypertext
 class MyMarkdownToHypertextParser
 	attr_reader :results
@@ -25,15 +27,20 @@ class MyMarkdownToHypertextParser
 		end
 	end
 
+	def split_title_arr(match_data)
+		attrs, title  = {}, match_data[2].split(' ')
+		attrs['href'] = title[0]
+		title = title[1..-1].join(' ').gsub("\\","").gsub("'",'"')
+		title = title.length > 1 ? title.to_s : ''
+		attrs['title'] = title if (title.length > 1)
+		attrs
+	end
+
 	def link_html(text, match_data)
-		element = 'a'
 		full_link = text.match(/\[(.*)\)/)[0]
+		attrs = split_title_arr(match_data)
 		text = match_data[1]
-		attr_text = match_data[2].split(' ')
-		link = attr_text[0]
-		attr_text = attr_text[1..-1].join(' ').gsub("\\",'').gsub("'",'"')
-		element_title = attr_text.length > 1 ? " title=#{attr_text}" : ''
-		link_text = "<#{element} href=\"#{link}\"#{element_title.chomp}>#{text}</#{element}>"
+		link_text = Builder::XmlMarkup.new.a(text, attrs)
 		@markdown_text.gsub!(full_link, link_text)
 	end
 
