@@ -56,6 +56,13 @@ class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected, false)
 	end
 
+	def test_to_links_with_tag_element
+		wrapper_element = 'p'
+		markdown = "[example page](/example 'With a Title')"
+		expected = '<p><a href="/example" title="With a Title">example page</a></p>'
+		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected, wrapper_element)
+	end
+
 	def test_to_links_with_title
 		markdown = "[example page](/example ""With a Title"")"
 		expected = '<a href="/example" title="With a Title">example page</a>'
