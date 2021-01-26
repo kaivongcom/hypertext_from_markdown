@@ -1,16 +1,14 @@
 require "test/unit"
 require_relative "../mymarkdown_to_hypertext"
-require "builder"
-
+# require "builder"
 
 class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 
-	def assert_equal_of_MyMarkdownToHypertextParser(original, html, wrapper_element=true, attr_class=false)
-		actual, expected = MyMarkdownToHypertextParser.new(original, wrapper_element, attr_class).results, html
-		# actual, expected = MyMarkdownToHypertextParser.new(original, wrapper_element).results, html
+	def assert_equal_of_MyMarkdownToHypertextParser(original, html, wrapper_element=true, attr_class=false, link_title=false)
+		attrs = { element_name: wrapper_element, class: attr_class, link_title: link_title }
+		actual, expected = MyMarkdownToHypertextParser.new(original, attrs).results, html
 		assert_equal(expected, actual)
 	end
-
 
 	def test_for_h1
 		assert_equal_of_MyMarkdownToHypertextParser('# A First Level Header', '<h1>A First Level Header</h1>')
@@ -35,14 +33,26 @@ class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected, false)
 	end
 
-	def test_builder_links
-		actual = Builder::XmlMarkup.new.a('home page', href: '/')
-		assert_equal('<a href="/">home page</a>', actual)
-	end
+	# def test_builder_links
+	# 	actual = Builder::XmlMarkup.new.a('home page', href: '/')
+	# 	assert_equal('<a href="/">home page</a>', actual)
+	# end
 
 	def test_to_only_links
 		markdown = "[home page](/example)"
 		expected = '<a href="/example">home page</a>'
+		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected, false)
+	end
+
+	def test_emphesis
+		markdown = "*browsing* right now"
+		expected = '<em>browsing</em> right now'
+		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected, false)
+	end
+
+	def test_to_only_links_with_italics
+		markdown = "[*home page*](/example)"
+		expected = '<a href="/example"><em>home page</em></a>'
 		assert_equal_of_MyMarkdownToHypertextParser(markdown, expected, false)
 	end
 
@@ -76,16 +86,22 @@ class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 		assert_equal_of_MyMarkdownToHypertextParser(md, actual)
 	end
 
-	def test_class_name_paragraph
-		md = "here is [a example link](http://example.com/ ""With a Title"") to something else"
-		actual = '<p class="new-class">here is <a href="http://example.com/" title="With a Title">a example link</a> to something else</p>'
-		assert_equal_of_MyMarkdownToHypertextParser(md, actual, 'p', 'new-class')
-	end
+	# def test_class_name_paragraph
+	# 	md = "here is [a example link](http://example.com/ ""With a Title"") to something else"
+	# 	actual = '<p class="new-class">here is <a href="http://example.com/" title="With a Title">a example link</a> to something else</p>'
+	# 	assert_equal_of_MyMarkdownToHypertextParser(md, actual, 'p', 'new-class')
+	# end
+
+	def test_emoji_class_name_1
+	 	md = "[🦔](# ""emoji"")"
+	 	actual = '<span><a href="#" title="emoji">🦔</a></span>'
+	 	assert_equal_of_MyMarkdownToHypertextParser(md, actual, 'span', 'emoji')
+	 end
 
 	def test_emoji_class_name
-	 	md = "[🦔](# ""emoji"")"
-	 	actual = '<span class="emoji"><a href="#" title="emoji">🦔</a></span>'
-	 	assert_equal_of_MyMarkdownToHypertextParser(md, actual, 'span', 'emoji')
+	 	md = "[🦔](# 'has title')"
+	 	actual = '<a href="#" title="has title">🦔</a>'
+	 	assert_equal_of_MyMarkdownToHypertextParser(md, actual, false, 'emoji')
 	 end
 
 	def test_wrapper_p2
@@ -100,3 +116,4 @@ class TestMyMarkdownToHypertextParser < Test::Unit::TestCase
 		assert_equal_of_MyMarkdownToHypertextParser(md, act, false)
 	end
 end
+

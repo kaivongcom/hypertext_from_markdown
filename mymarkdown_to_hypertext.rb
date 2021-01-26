@@ -1,15 +1,28 @@
-require "builder"
+# require "builder"
 
 #class MarkdownIntoHypertext
 class MyMarkdownToHypertextParser
 	attr_reader :results
 
-	def initialize(markdown_text, element_name=false, attr_class=false)
+	def initialize(markdown_text, attrs_hash={})
+		attrs = {}
+		element_name, attrs[:class], attrs[:title] = attrs_hash[:element_name], attrs_hash[:attr_class], attrs_hash[:link_title]
 		@markdown_text = markdown_text.chomp
 		find_links(markdown_text)
+		find_emphasis(markdown_text)
 		length = @markdown_text.scan(/\n/).count
 		markdown_obj = { text: @markdown_text, length: length }
-		@results = wrap_markdown(element_name, markdown_obj, attr_class)
+		@results = wrap_markdown(element_name, markdown_obj, attrs)
+	end
+
+	def find_emphasis(markdown_text)
+		em_matches = markdown_text.match(/\*(.*)\*/)
+		em_html(em_matches) if em_matches
+	end
+
+	def em_html(em_matches)
+		html_em = "<em>#{em_matches[1]}</em>"
+		@markdown_text.gsub!(em_matches[0], html_em)
 	end
 
 	def find_links(markdown_text)
@@ -17,20 +30,29 @@ class MyMarkdownToHypertextParser
 		link_html(markdown_text, link_matches) if link_matches
 	end
 
-	def wrap_markdown(element,markdown, attr_class)
+	def wrap_markdown(element, markdown, attrs)
 		if element == false || (element == false && @markdown_text[1] == 'a')
 			@markdown_text
 		elsif element == true
-			@markdown_text.match(/^#|====/) ? header_html(markdown) : paragraph_html(markdown, attr_class)
+			if @markdown_text.match(/^#|====/)
+				header_html(markdown)
+			else
+				paragraph_html(markdown, attrs)
+			end
 		elsif element
-			@markdown_text.match(/^#|====/) ? header_html(markdown) : wrap_html(markdown, element, attr_class)
+			if @markdown_text.match(/^#|====/)
+				header_html(markdown)
+			else
+				wrap_html(markdown, element, attrs)
+			end
 		end
 	end
 
 	def split_title_arr(match_data)
 		attrs, title  = {}, match_data[2].split(' ')
 		attrs['href'] = title[0]
-		title = title[1..-1].join(' ').gsub("\\","").gsub("'",'"')
+		title = title[1..-1].join(' ')
+		title.split(' ')
 		title = title.length > 1 ? title.to_s : ''
 		attrs['title'] = title if (title.length > 1)
 		attrs
@@ -40,7 +62,8 @@ class MyMarkdownToHypertextParser
 		full_link = text.match(/\[(.*)\)/)[0]
 		attrs = split_title_arr(match_data)
 		text = match_data[1]
-		link_text = Builder::XmlMarkup.new.a(text, attrs)
+		element_attrs = attrs.collect { |attr, value| " #{attr}=\"#{value.gsub("'",'')}\"" }.join('')
+		link_text = "<a#{element_attrs}>#{text}</a>"
 		@markdown_text.gsub!(full_link, link_text)
 	end
 
@@ -63,16 +86,18 @@ class MyMarkdownToHypertextParser
 		end
 	end
 
-	def wrap_html(obj, element_name, attr_class)
+	def wrap_html(obj, element_name, attrs)
+		# element_attrs = ''
+		# attr_class && ['span','p'].include?(element_name) ? element_attrs=" class=""#{attr_class}"""  : ''
 		element_attrs = ''
-		attr_class && ['span','p'].include?(element_name) ? element_attrs=" class=\"#{attr_class}\""  : ''
+		element_attrs = " class=""#{attrs[:class]}""" if attrs[:class]
 		obj[:text].split("\n").collect do |element_text|
 			"<#{element_name}#{element_attrs}>#{element_text}</#{element_name}>"
 		end.join
 	end
 
-	def paragraph_html(obj, attr_class)
-		wrap_html(obj, 'p', attr_class)
+	def paragraph_html(obj, attrs)
+		wrap_html(obj, 'p', attrs)
 	end
 end
 
