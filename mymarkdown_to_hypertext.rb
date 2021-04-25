@@ -1,6 +1,3 @@
-# require "builder"
-
-#class MarkdownIntoHypertext
 class MyMarkdownToHypertextParser
 	attr_reader :results
 
@@ -9,6 +6,7 @@ class MyMarkdownToHypertextParser
 		element_name, attrs[:class], attrs[:title] = attrs_hash[:element_name], attrs_hash[:attr_class], attrs_hash[:link_title]
 		@markdown_text = markdown_text.chomp
 		find_links(markdown_text)
+		find_strong(markdown_text)
 		find_emphasis(markdown_text)
 		length = @markdown_text.scan(/\n/).count
 		markdown_obj = { text: @markdown_text, length: length }
@@ -16,8 +14,18 @@ class MyMarkdownToHypertextParser
 	end
 
 	def find_emphasis(markdown_text)
-		em_matches = markdown_text.match(/\*(.*)\*/)
-		em_html(em_matches) if em_matches
+		matches = markdown_text.match(/\*(.*)\*/)
+		em_html(matches) if matches
+	end
+
+	def find_strong(markdown_text)
+		matches = markdown_text.match(/\*\*(.*)\*\*/)
+		strong_html(matches) if matches
+	end
+
+	def strong_html(matches)
+		html_em = "<strong>#{matches[1]}</strong>"
+		@markdown_text.gsub!(matches[0], html_em)
 	end
 
 	def em_html(em_matches)
@@ -32,7 +40,7 @@ class MyMarkdownToHypertextParser
 
 	def wrap_markdown(element, markdown, attrs)
 		if element == false || (element == false && @markdown_text[1] == 'a')
-			@markdown_text
+			@markdown_text.chomp
 		elsif element == true
 			if @markdown_text.match(/^#|====/)
 				header_html(markdown)
@@ -97,13 +105,6 @@ class MyMarkdownToHypertextParser
 	end
 
 	def paragraph_html(obj, attrs)
-		wrap_html(obj, 'p', attrs)
+		obj[:text] != ' ' ? wrap_html(obj, 'p', attrs) : ''
 	end
 end
-
-def tests_for_parser
-	markdown = "\nA Second Level Header\n---------------------\nNow is the time for all good men to come to\nthe aid of their country. This is just a\nregular paragraph.\n\nThe quick brown fox jumped over the lazy\ndog's back.\n\n> ## This is an H2 in a blockquote"
-	MyMarkdownToHypertextParser.new(markdown).results
-end
-
-tests_for_parser()
