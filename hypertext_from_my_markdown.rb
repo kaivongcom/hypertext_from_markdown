@@ -7,6 +7,7 @@ class HypertextFromMyMarkdownParser < Object
 		element_name, @attrs[:class], @attrs[:title], @attrs[:href],@attrs[:id] = attrs_hash[:element_name], attrs_hash[:attr_class], attrs_hash[:link_title], attrs_hash[:href], attrs_hash[:attr_id]
 		@markdown_text = markdown_text.chomp
 		element_name = find_element(element_name, markdown_text) if element_name == nil
+		find_bold(markdown_text)
 		find_emphasis(markdown_text)
 		find_img(markdown_text)
 		find_links(markdown_text)
@@ -20,6 +21,12 @@ class HypertextFromMyMarkdownParser < Object
 	def find_element(element, md)
 		element = (md.scan(/^#/).count) == 1 || (md.scan(/ $/).count) == 1
 	end
+
+	def find_bold(markdown_text)
+		matches = markdown_text.match(/\*\*(.*)\*\*/)
+		strong_html(matches) if matches
+	end
+
 
 	def find_emphasis(markdown_text)
 		matches = markdown_text.match(/\*(.*)\*/)
@@ -58,9 +65,9 @@ class HypertextFromMyMarkdownParser < Object
 		@markdown_text.gsub!(markdown_text, html)
 	end
 
-	def strong_html(matches)
-		html_em = "<strong>#{matches[1]}</strong>"
-		@markdown_text.gsub!(matches[0], html_em)
+	def strong_html(strong_matches)
+		strong_html = "<strong>#{strong_matches[1]}</strong>"
+		@markdown_text.gsub!(strong_matches[0], strong_html)
 	end
 
 	def em_html(em_matches)
