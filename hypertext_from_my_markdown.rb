@@ -128,7 +128,9 @@ class HypertextFromMyMarkdownParser < Object
 	end
 
 	def single_header_html(text)
-		element_number = if text.scan(/^###/).length == 1
+		element_number = if text.scan(/^####/).length == 1
+			4
+		elsif text.scan(/^###/).length == 1
 			3
 		elsif text.scan(/^##/).length == 1
 			2
@@ -136,8 +138,17 @@ class HypertextFromMyMarkdownParser < Object
 			1
 		end
 		element = "h#{element_number}"
+		header_md = '#' * element_number
+		class_attr = text.scan(/^#{header_md}\.(\w+)/)
+		class_name = if class_attr.empty? 
+				''
+			else 
+				class_attr = class_attr[0][0]
+				text.gsub!(".#{class_attr} ",'')
+				" class=\"#{class_attr}\""
+			end
 		plain_text = text[element_number..-1].strip
-		"<#{element}>#{plain_text}</#{element}>"
+		"<#{element}#{class_name}>#{plain_text}</#{element}>"
 	end
 
 	def multi_header_html(text)

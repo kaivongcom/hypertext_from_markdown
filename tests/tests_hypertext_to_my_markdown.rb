@@ -79,6 +79,12 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal_of_parser("A First Level Header\n ====================", '<h1>A First Level Header</h1>')
 	end
 
+	def test_for_h4_class_name
+		markdown =  HypertextFromMyMarkdownParser.new("####.tidy a title").results
+		output_html_desired = '<h4 class="tidy">a title</h4>'	
+		assert_equal(output_html_desired, markdown)
+	end
+
 	# def test_for_p_class
 	# 	attrs = { attr_class: 'example'}
 	# 	markdown = '<p>clever little styled paragraph'
