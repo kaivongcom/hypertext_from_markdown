@@ -144,7 +144,7 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		markdown_image = '![computer game shop](http://www.kaivong.com/images/square/515.jpg)'
 		attrs = {element_name: false, link_title: 'computer game shop'} # alt
 		markdown = HypertextFromMyMarkdownParser.new(markdown_image, attrs).results
-		actual = '<img src="http://www.kaivong.com/images/square/515.jpg" alt="computer game shop">'
+		actual = '<img alt="computer game shop" src="http://www.kaivong.com/images/square/515.jpg">'
 		assert_equal(actual, markdown)
 	end
 
@@ -152,7 +152,7 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		markdown_image = '![computer game shop](http://www.kaivong.com/images/square/515.jpg)'
 		attrs = { element_name: 'a', link_title: 'computer game shop', href: 'https://kaivong.com' }
 		markdown = HypertextFromMyMarkdownParser.new(markdown_image, attrs).results
-		actual = '<a href="https://kaivong.com"><img src="http://www.kaivong.com/images/square/515.jpg" alt="computer game shop"></a>'
+		actual = '<a href="https://kaivong.com"><img alt="computer game shop" src="http://www.kaivong.com/images/square/515.jpg"></a>'
 		assert_equal(actual, markdown)
 	end
 
@@ -239,4 +239,12 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		html = '<strong>here is <a href="http://example.com/" title="With a Title">a example link</a> to something else</strong>'
 		assert_equal_of_parser(md, html, 'strong')
 	end
+
+	# def test_no_parsing
+	# 	md = """<pre><code>
+	# 				test no parse
+	# 		</code></pre>"""
+	# 	actual = md
+	# 	assert_equal_of_parser(md, actual)
+	# end
 end
