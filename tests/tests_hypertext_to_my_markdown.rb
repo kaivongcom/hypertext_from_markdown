@@ -19,9 +19,9 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 	end
 
 	def test_for_anchor_link_text_wrapped
-		markdown = "[home page](/example)  "
+		markdown = "[home page](/example) "
 		markdown = HypertextFromMyMarkdownParser.new(markdown).results
-		assert_equal(markdown, '<p><a href="/example">home page</a>  </p>')
+		assert_equal(markdown, '<p><a href="/example">home page</a> </p>')
 	end
 
 	def test_for_attrs_with_img
@@ -148,11 +148,11 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal(actual, markdown)
 	end
 
-	def test_a_img_html
-		markdown_image = '![computer game shop](http://www.kaivong.com/images/square/515.jpg)'
-		attrs = { element_name: 'a', link_title: 'computer game shop', href: 'https://kaivong.com' }
+	def test_a_img_html_params
+		markdown_image = '![link factory](http://www.kaivong.com/images/square/515.jpg alt="something amazing" height="100" width="100")'
+		attrs = { element_name: 'a', link_title: 'link factory', href: 'https://kaivong.com' }
 		markdown = HypertextFromMyMarkdownParser.new(markdown_image, attrs).results
-		actual = '<a href="https://kaivong.com"><img alt="computer game shop" src="http://www.kaivong.com/images/square/515.jpg"></a>'
+		actual = '<a href="https://kaivong.com"><img alt="link factory" src="http://www.kaivong.com/images/square/515.jpg"></a>'
 		assert_equal(actual, markdown)
 	end
 
