@@ -85,31 +85,11 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal(output_html_desired, markdown)
 	end
 
-	# def test_for_p_class
-	# 	attrs = { attr_class: 'example'}
-	# 	markdown = '<p>clever little styled paragraph'
-	# 	markdown = HypertextFromMyMarkdownParser.new(markdown, attrs).results
-	# 	assert_equal(markdown, '<p class="example">clever little styled paragraph')
-	# end
-
-	# def test_for_p_class_escaped
-	# 	markdown = "clever little styled paragraph  "
-	# 	markdown = HypertextFromMyMarkdownParser.new(markdown).results
-	# 	assert_equal(markdown, '<p>clever little styled paragraph</p>')
-	# end
-
 	def test_for_plain_text_unescaped
 		markdown = "example text line for unstyled"
 		expected = "example text line for unstyled"
 		assert_equal_of_parser(markdown, expected, false)
 	end
-
-	# def test_for_p_within_paragraph
-	# 	markdown, markdown_text = "clever little styled paragraph  ", "lorem ipsum is fun"
-	# 	markdown = HypertextFromMyMarkdownParser.new(markdown).results
-	# 	markdown_paragraphs = HypertextFromMyMarkdownParser.new(markdown + markdown_text).results
-	# 	assert_equal(markdown_paragraphs, (markdown + ' ' + markdown_text))
-	# end
 
 	def test_for_paragraph_text_without_element
 		paragraph = "example text line for unstyled"
@@ -239,12 +219,4 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		html = '<strong>here is <a href="http://example.com/" title="With a Title">a example link</a> to something else</strong>'
 		assert_equal_of_parser(md, html, 'strong')
 	end
-
-	# def test_no_parsing
-	# 	md = """<pre><code>
-	# 				test no parse
-	# 		</code></pre>"""
-	# 	actual = md
-	# 	assert_equal_of_parser(md, actual)
-	# end
 end
