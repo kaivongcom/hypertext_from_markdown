@@ -75,6 +75,14 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal_of_parser(markdown_parsed, expected, false, attrs[:attr_class])
 	end
 
+	def test_for_h2_inline_class
+		original = '##.warning different Second Level Header'
+		# markdown_parsed = HypertextFromMyMarkdownParser.new(original, {element_name: false}).results
+		markdown_parsed = HypertextFromMyMarkdownParser.new(original).results
+		expected = '<h2 class="warning">different Second Level Header</h2>'
+		assert_equal_of_parser(markdown_parsed, expected)
+	end
+
 	def test_for_h1_long_parse
 		assert_equal_of_parser("A First Level Header\n ====================", '<h1>A First Level Header</h1>')
 	end
