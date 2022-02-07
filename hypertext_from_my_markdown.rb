@@ -1,9 +1,11 @@
 # html_from = ''
 # require_relative "../helpers/#{html_from}/HTML_elements/"
-
+ENDING_INDEX = -1
+STARTING_INDEX = 0
 class HypertextFromMyMarkdownParser < Object
 
 	attr_reader :text, :obj
+
 	# START_TABLE = '<table summary="">'
 
 	def initialize(markdown_text, attrs_hash={})
@@ -29,10 +31,12 @@ class HypertextFromMyMarkdownParser < Object
 		results = markdown_text
 		if results.strip.empty?
 			# give a warning message?
-		elsif results[0] == '#'
 			# find_bold(markdown_text)
 			# find_emphasis(markdown_text)
-			results = surround_a_header(markdown_text)
+		elsif results[0] == '#' 
+			results = surround_a_header(markdown_text, STARTING_INDEX)
+		elsif results[ENDING_INDEX] == '='
+			results = surround_a_header(markdown_text, ENDING_INDEX)
 			# find_img(markdown_text)
 			# find_links(markdown_text)
 			# find_strong(markdown_text)
@@ -43,10 +47,15 @@ class HypertextFromMyMarkdownParser < Object
 		results
 	end
 
-	def surround_a_header(text)
-		text_arr = text.split('# ')
-		header = text_arr[1].strip
-		header_level = text_arr[0].scan('#').count + 1
+	def surround_a_header(text, markdown_from)
+		if markdown_from == STARTING_INDEX
+			text_arr = text.split('# ')
+			header = text_arr[1].strip
+			header_level = text_arr[STARTING_INDEX].scan('#').count + 1
+		elsif markdown_from == ENDING_INDEX
+			header = text.split("\n")[STARTING_INDEX]
+			header_level = 1
+		end
 		"<h#{header_level}>#{header}</h#{header_level}>"
 	end
 

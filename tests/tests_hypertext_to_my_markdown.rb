@@ -7,14 +7,19 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal(actual, expected)
 	end
 
-	def test_for_text_remains_normal
-		a_passage_of_markdown = HypertextFromMyMarkdownParser.new("a block containing my text in the middle").text
-		assert_equal('<p>a block containing my text in the middle</p>', a_passage_of_markdown)
+	def test_for_paragraph_text_without_element
+		paragraph = "example line of text unstyled"
+		assert_equal_of_parser(paragraph, "<p>example line of text unstyled</p>")
 	end
 
 	def test_for_text_surrounded_by_pTag
 		a_passage_of_markdown = HypertextFromMyMarkdownParser.new("a block containing my text in the middle").text
 		assert_equal('<p>a block containing my text in the middle</p>', a_passage_of_markdown)
+	end
+
+	def test_for_h1_long_parse
+		# pend
+		assert_equal_of_parser("A First Level Header\n ====================", '<h1>A First Level Header</h1>')
 	end
 
 	# def test_for_h2_plus_class
@@ -27,16 +32,11 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 
 	# def test_for_h2_inline_class
 	# 	pend
-	# 	# 	original = '##.warning different Second Level Header'
-	# 	# 	# markdown_parsed = HypertextFromMyMarkdownParser.new(original, {element_name: false}).text
-	# 	# 	markdown_parsed = HypertextFromMyMarkdownParser.new(original).text
-	# 	# 	expected = '<h2 class="warning">different Second Level Header</h2>'
-	# 	# 	assert_equal_of_parser(markdown_parsed, expected)
-	# end
-
-	# def test_for_h1_long_parse
-	# 	pend
-	# 	# 	pass # 	assert_equal_of_parser("A First Level Header\n ====================", '<h1>A First Level Header</h1>')
+	# 	original = '##.warning different Second Level Header'
+	# 	# markdown_parsed = HypertextFromMyMarkdownParser.new(original, {element_name: false}).text
+	# 	markdown_parsed = HypertextFromMyMarkdownParser.new(original).text
+	# 	expected = '<h2 class="warning">different Second Level Header</h2>'
+	# 	assert_equal_of_parser(markdown_parsed, expected)
 	# end
 
 	# def test_for_h4_class_name
@@ -45,12 +45,6 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 	# 	# 	output_html_desired = '<h4 class="tidy">a title</h4>'	
 	# 	# 	assert_equal(output_html_desired, markdown)
 	# end
-
-	def test_for_paragraph_text_without_element
-			# paragraph = "example text line for unstyled"
-			# markdown = HypertextFromMyMarkdownParser.new(paragraph).text
-			# assert_equal_of_parser(markdown, "<p>example text line for unstyled</p>")
-	end
 
 	# def test_for_h1
 	# 	tests = { actual: '# A First Level Header', expected: '<h1>A First Level Header</h1>' }
