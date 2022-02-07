@@ -27,14 +27,19 @@ class HypertextFromMyMarkdownParser < Object
 
 	def find_html_element(markdown_text)
 		results = markdown_text
-		# find_bold(markdown_text)
-		# find_emphasis(markdown_text)
-		results = surround_a_header(markdown_text) if results[0] == '#'
-		# find_img(markdown_text)
-		# find_links(markdown_text)
-		# find_strong(markdown_text)
-		# find_tables(markdown_text)
-		results = surround_by_paragraph(results) if results[-1] == ' '
+		if results.strip.empty?
+			# give a warning message?
+		elsif results[0] == '#'
+			# find_bold(markdown_text)
+			# find_emphasis(markdown_text)
+			results = surround_a_header(markdown_text)
+			# find_img(markdown_text)
+			# find_links(markdown_text)
+			# find_strong(markdown_text)
+			# find_tables(markdown_text)
+		else 
+			results = surround_by_paragraph(results)
+		end
 		results
 	end
 
@@ -46,6 +51,6 @@ class HypertextFromMyMarkdownParser < Object
 	end
 
 	def surround_by_paragraph(text)
-		"<p>#{text.chop}</p>"
+		"<p>#{text}</p>"
 	end
 end

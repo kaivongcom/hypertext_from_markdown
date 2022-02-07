@@ -9,11 +9,11 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 
 	def test_for_text_remains_normal
 		a_passage_of_markdown = HypertextFromMyMarkdownParser.new("a block containing my text in the middle").text
-		assert_equal('a block containing my text in the middle', a_passage_of_markdown)
+		assert_equal('<p>a block containing my text in the middle</p>', a_passage_of_markdown)
 	end
 
 	def test_for_text_surrounded_by_pTag
-		a_passage_of_markdown = HypertextFromMyMarkdownParser.new("a block containing my text in the middle ").text
+		a_passage_of_markdown = HypertextFromMyMarkdownParser.new("a block containing my text in the middle").text
 		assert_equal('<p>a block containing my text in the middle</p>', a_passage_of_markdown)
 	end
 
@@ -46,16 +46,10 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 	# 	# 	assert_equal(output_html_desired, markdown)
 	# end
 
-	def test_for_plain_text_unescaped
-			markdown = "example text line for unstyled"
-			expected = "example text line for unstyled"
-			assert_equal_of_parser(markdown, expected)
-	end
-
 	def test_for_paragraph_text_without_element
-			paragraph = "example text line for unstyled "
-			markdown = HypertextFromMyMarkdownParser.new(paragraph).text
-			assert_equal_of_parser(markdown, "<p>example text line for unstyled</p>")
+			# paragraph = "example text line for unstyled"
+			# markdown = HypertextFromMyMarkdownParser.new(paragraph).text
+			# assert_equal_of_parser(markdown, "<p>example text line for unstyled</p>")
 	end
 
 	# def test_for_h1
