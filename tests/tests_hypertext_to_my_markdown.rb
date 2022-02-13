@@ -22,6 +22,33 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal_of_parser("A First Level Header\n ====================", '<h1>A First Level Header</h1>')
 	end
 
+	def test_for_anchor_link_text
+		# pend
+		# 	actual = "[home page](/example)"
+		# 	assert_equal_of_parser(actual, '<a href="/example">home page</a>', false)
+	end
+
+	def test_for_anchor_link_text_within_text
+		pend
+		test = { markdown: 'Link to [Google](http://google.com)', html: 'Link to <a href="http://google.com">Google</a>' }
+		assert_equal_of_parser(test[:markdown], test[:html], false)
+	end
+
+	def test_for_anchor_link_text_wrapped
+		pend
+		markdown = "[home page](/example) "
+		markdown = HypertextFromMyMarkdownParser.new(markdown).results
+		assert_equal(markdown, '<p><a href="/example">home page</a> </p>')
+	end
+
+	def test_complex_link
+		pend
+		md = "[CSS prefers-reduced-data media-query](https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-data ""Media Queries Level 5 Editor’s Draft, 21 November 2020"")"
+		act = '<a href="https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-data" title="Media Queries Level 5 Editor’s Draft, 21 November 2020">CSS prefers-reduced-data media-query</a>'
+		assert_equal_of_parser(md, act, false)
+	end
+
+
 	# def test_for_h2_plus_class
 	# 	pend
 	# 	# 	original = 'A Second Level Header'
@@ -60,35 +87,9 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 	# 	assert_equal_of_parser('## A Second Level Header', '<h2>A Second Level Header</h2>')
 	# end
 
-	# def test_for_anchor_link_text
-	# 	pend
-	# 	# 	actual = "[home page](/example)"
-	# 	# 	assert_equal_of_parser(actual, '<a href="/example">home page</a>', false)
-	# end
-
-	# def test_for_anchor_link_text_within_text
-	# 	pend
-	# 	# 	test = { markdown: 'Link to [Google](http://google.com)', html: 'Link to <a href="http://google.com">Google</a>' }
-	# 	# 	assert_equal_of_parser(test[:markdown], test[:html], false)
-	# end
-
-	# def test_for_anchor_link_text_wrapped
-	# 	pend
-	# 	# 	markdown = "[home page](/example) "
-	# 	# 	markdown = HypertextFromMyMarkdownParser.new(markdown).results
-	# 	# 	assert_equal(markdown, '<p><a href="/example">home page</a> </p>')
-	# end
-
 	# def test_for_attrs_with_img
 	# 	pend
 	# 	# 	md = "![pop tarts](/images/notes/square/20.png),  { element_name: 'a', link_title: 'computer game shop', href: 'https://kaivong.com' }"
-	# end
-
-	# def test_complex_link
-	# 	pend
-	# 	# 	md = "[CSS prefers-reduced-data media-query](https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-data ""Media Queries Level 5 Editor’s Draft, 21 November 2020"")"
-	# 	# 	act = '<a href="https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-data" title="Media Queries Level 5 Editor’s Draft, 21 November 2020">CSS prefers-reduced-data media-query</a>'
-	# 	# 	assert_equal_of_parser(md, act, false)
 	# end
 
 	# def test_emphesis
