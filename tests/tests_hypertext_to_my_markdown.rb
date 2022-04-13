@@ -2,6 +2,7 @@ require "test/unit"
 require_relative "../hypertext_from_my_markdown"
 
 class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
+
 	def assert_equal_of_parser(markdown_text, html)
 		actual, expected = HypertextFromMyMarkdownParser.new(markdown_text).text, html
 		assert_equal(actual, expected)
@@ -47,7 +48,6 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		act = '<a href="https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-data" title="Media Queries Level 5 Editor’s Draft, 21 November 2020">CSS prefers-reduced-data media-query</a>'
 		assert_equal_of_parser(md, act, false)
 	end
-
 
 	# def test_for_h2_plus_class
 	# 	pend
