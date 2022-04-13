@@ -3,14 +3,14 @@ require_relative "../hypertext_from_my_markdown"
 
 class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 	def assert_equal_of_parser(original, html, wrapper_element=true, attr_class=false, attr_id=false, link_title=false)
-		attrs = { element_name: wrapper_element, class: attr_class, link_title: link_title, id: attr_id }
-		actual, expected = HypertextFromMyMarkdownParser.new(original, attrs).results, html
-		assert_equal(expected, actual)
+		attrs = { "element_name" => wrapper_element, "class" => attr_class, "link_title" => link_title, "id" => attr_id }
+		actual_expected, expected = HypertextFromMyMarkdownParser.new(original, attrs).results, html
+		assert_equal(expected, actual_expected)
 	end
 
 	def test_for_anchor_link_text
-		actual = "[home page](/example)"
-		assert_equal_of_parser(actual, '<a href="/example">home page</a>', false)
+		actual_expected = "[home page](/example)"
+		assert_equal_of_parser(actual_expected, '<a href="/example">home page</a>', false)
 	end
 
 	def test_for_anchor_link_text_within_text
@@ -47,32 +47,32 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 
 	def test_emoji_class_name_1
 	 	md = "[🦔](# ""emoji"")"
-	 	actual = '<span><a href="#" title="emoji">🦔</a></span>'
-	 	assert_equal_of_parser(md, actual, 'span', 'emoji')
+	 	actual_expected = '<span><a href="#" title="emoji">🦔</a></span>'
+	 	assert_equal_of_parser(md, actual_expected, 'span', 'emoji')
 	 end
 
 	def test_emoji_class_name
 	 	md = "[🦔](# 'has title')"
-	 	actual = '<a href="#" title="has title">🦔</a>'
-	 	assert_equal_of_parser(md, actual, false, 'emoji')
+	 	actual_expected = '<a href="#" title="has title">🦔</a>'
+	 	assert_equal_of_parser(md, actual_expected, false, 'emoji')
 	 end
 
 	def test_for_external_links
-		actual = "[home page](http://example.com/pages/index.html external)"
-		assert_equal_of_parser(actual, '<a href="http://example.com/pages/index.html" title="external" class="external">home page</a> (http://example.com)', false)
+		actual_expected = "[home page](http://example.com/pages/index.html external)"
+		assert_equal_of_parser(actual_expected, '<a href="http://example.com/pages/index.html" title="external" class="external">home page</a> (http://example.com)', false)
 	end
 
 	def test_for_empty_space
-		tests = { actual: ' ', expected: '' }
-		assert_equal_of_parser(tests[:actual], tests[:expected] )
+		tests = { actual_expected: ' ', expected: '' }
+		assert_equal_of_parser(tests[:actual_expected], tests[:expected] )
 	end
 
 	def test_for_h2_plus_class
 		original = 'A Second Level Header'
-		attrs = { attr_class: 'warning', element_name: 'h2' }
+		attrs = { 'attr_class' => 'warning', 'element_name' => 'h2' }
 		markdown_parsed = HypertextFromMyMarkdownParser.new(original, attrs).results
 		expected = '<h2 class="warning">A Second Level Header</h2>'
-		assert_equal_of_parser(markdown_parsed, expected, false, attrs[:attr_class])
+		assert_equal_of_parser(markdown_parsed, expected, false)
 	end
 
 	def test_for_h1_long_parse
@@ -98,8 +98,8 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 	end
 
 	def test_for_h1
-		tests = { actual: '# A First Level Header', expected: '<h1>A First Level Header</h1>' }
-		assert_equal_of_parser(tests[:actual], tests[:expected] )
+		tests = { actual_expected: '# A First Level Header', expected: '<h1>A First Level Header</h1>' }
+		assert_equal_of_parser(tests[:actual_expected], tests[:expected] )
 	end
 
 	def test_for_h1_hashtag
@@ -124,16 +124,8 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		markdown_image = '![computer game shop](http://www.kaivong.com/images/square/515.jpg)'
 		attrs = {element_name: false, link_title: 'computer game shop'} # alt
 		markdown = HypertextFromMyMarkdownParser.new(markdown_image, attrs).results
-		actual = '<img alt="computer game shop" src="http://www.kaivong.com/images/square/515.jpg">'
-		assert_equal(actual, markdown)
-	end
-
-	def test_a_img_html_params
-		markdown_image = '![link factory](http://www.kaivong.com/images/square/515.jpg alt="something amazing" height="100" width="100")'
-		attrs = { element_name: 'a', link_title: 'link factory', href: 'https://kaivong.com' }
-		markdown = HypertextFromMyMarkdownParser.new(markdown_image, attrs).results
-		actual = '<a href="https://kaivong.com"><img alt="link factory" src="http://www.kaivong.com/images/square/515.jpg"></a>'
-		assert_equal(actual, markdown)
+		actual_expected = '<img alt="computer game shop" src="http://www.kaivong.com/images/square/515.jpg">'
+		assert_equal(actual_expected, markdown)
 	end
 
 	def test_to_links_with_tag_element
@@ -156,32 +148,33 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 
 	def test_for_tables_header
 		original = '| # | name1 | name2 | name3 |'
-		expected = '<table summary=""><thead><tr><td> name1 </td><td> name2 </td><td> name3 </td></tr></thead>'
+		expected = '<table summary=""><thead><tr><td>name1</td><td>name2</td><td>name3</td></tr></thead>'
 		attrs = { element_name: false, attr_class: '' }
 		assert_equal_of_parser(original, expected, attrs[:element_name])
 	end
 
 	def test_for_table_row
 		original = '| ## | bill | bob | jess |'
-		expected = '<tr><td> bill </td><td> bob </td><td> jess </td></tr>'
-		attrs = { element_name: false, attr_class: '' }
-		assert_equal_of_parser(original, expected, attrs[:element_name])
+		expected = '<tr><td>bill</td><td>bob</td><td>jess</td></tr>'
+		attrs = { 'element_name' => false }
+		html = HypertextFromMyMarkdownParser.new(original, attrs).results
+		assert_equal(html, expected)
 	end
 
 	def test_for_table_row_id
 		original = '| ## | bill | bob | jess |'
-		actual = '<tr id="people"><td> bill </td><td> bob </td><td> jess </td></tr>'
-		attrs = { element_name: false, attr_id: 'people' }
+		actual_expected = '<tr id="people"><td>bill</td><td>bob</td><td>jess</td></tr>'
+		attrs = { 'element_name' => false, 'attr_id' => 'people' }
 		markdown = HypertextFromMyMarkdownParser.new(original, attrs).results
-		assert_equal(markdown, actual)
+		assert_equal(markdown, actual_expected)
 	end
 
 	def test_for_table_row_class_and_id
 		original = '| ## | bill | bob | jess |'
-		actual = '<tr id="footballers" class="players"><td> bill </td><td> bob </td><td> jess </td></tr>'
-		attrs = { element_name: false, attr_id: 'footballers', attr_class: 'players' }
+		actual_expected = '<tr id="footballers" class="players"><td>bill</td><td>bob</td><td>jess</td></tr>'
+		attrs = { 'element_name' => false, 'attr_id' => 'footballers', 'attr_class' => 'players' }
 		markdown = HypertextFromMyMarkdownParser.new(original, attrs).results
-		assert_equal(markdown, actual)
+		assert_equal(markdown, actual_expected)
 	end
 
 	def test_text_left_side_to_short_link_in_paragraph
@@ -210,8 +203,8 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 
 	def test_wrapped_in_text_link_paragraph
 		md = "here is [a example link](http://example.com/ ""With a Title"") to something else"
-		actual = '<p>here is <a href="http://example.com/" title="With a Title">a example link</a> to something else</p>'
-		assert_equal_of_parser(md, actual)
+		actual_expected = '<p>here is <a href="http://example.com/" title="With a Title">a example link</a> to something else</p>'
+		assert_equal_of_parser(md, actual_expected)
 	end
 
 	def test_wrapper_p2

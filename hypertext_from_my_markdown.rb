@@ -1,21 +1,26 @@
 class HypertextFromMyMarkdownParser < Object
 	attr_reader :results
 	START_TABLE = '<table summary="">'
+	TABLE_HEADER = 'thead'
 
 	def initialize(markdown_text, attrs_hash={})
 		@attrs = {}
-		element_name, @attrs[:class], @attrs[:title], @attrs[:href],@attrs[:id] = attrs_hash[:element_name], attrs_hash[:attr_class], attrs_hash[:link_title], attrs_hash[:href], attrs_hash[:attr_id]
+		element_name, @attrs[:class], @attrs[:title], @attrs[:href],@attrs[:id] = attrs_hash['element_name'], attrs_hash['attr_class'], attrs_hash['link_title'], attrs_hash['href'], attrs_hash['attr_id']
 		@markdown_text = markdown_text.chomp
 		element_name = find_element(element_name, markdown_text) if element_name == nil
-		find_bold(markdown_text)
-		find_emphasis(markdown_text)
-		find_img(markdown_text)
-		find_links(markdown_text)
-		find_strong(markdown_text)
-		find_tables(markdown_text)
+		markdown_searches(markdown_text) #
 		length = @markdown_text.scan(/\n/).count
 		markdown_obj = { text: @markdown_text, length: length }
 		@results = wrap_markdown(element_name, markdown_obj, @attrs)
+	end
+
+	def markdown_searches(md)
+		find_bold(md)
+		find_emphasis(md)
+		find_img(md)
+		find_links(md)
+		find_strong(md)
+		find_tables(md)
 	end
 
 	def find_element(element, md)
@@ -50,19 +55,20 @@ class HypertextFromMyMarkdownParser < Object
 
 	def find_tables(text)
 		table_arr = text.split("|")
-		table_html(table_arr, text) if table_arr.size > 1
+		table_html(table_arr, text) if table_arr.size > 1 
 	end
 
-	def table_html(arr, markdown_text)
+	def table_html(arr, markdown)
 		arr.shift
-		element = arr.shift == ' # ' ? 'thead' : false
+		element = (arr.shift == ' # ') ?  TABLE_HEADER : false
 		table_element_partial = !element ? '' : START_TABLE + '<' + element + '>'
 		# items = arr.compact.collect { |item| find_links(item) if item != nil }
+
 		attributes = @attrs[:id] ? " id=\"#{@attrs[:id]}\"" : ''
 		attributes += @attrs[:class] ? " class=\"#{@attrs[:class]}\"" : ''
 		table_row = "<tr#{attributes}>"
-		html = "#{ table_element_partial }#{table_row}#{ (arr.compact.collect { |item| '<td>' + item + '</td>'   }.join) }</tr>#{element ? '</' + element + '>' : '' }"
-		@markdown_text.gsub!(markdown_text, html)
+		html = table_element_partial + table_row + (arr.compact.collect { |item| '<td>' + item.strip + '</td>'   }.join) + "</tr>#{element ? '</' + element + '>' : '' }"
+		@markdown_text.gsub!(markdown, html)
 	end
 
 	def strong_html(strong_matches)
