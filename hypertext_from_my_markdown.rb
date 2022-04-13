@@ -15,12 +15,7 @@ class HypertextFromMyMarkdownParser < Object
 	end
 
 	def markdown_searches(md)
-		find_bold(md)
-		find_emphasis(md)
-		find_img(md)
-		find_links(md)
-		find_strong(md)
-		find_tables(md)
+		find_bold(md); find_emphasis(md); find_img(md); find_links(md); find_strong(md); find_tables(md)
 	end
 
 	def find_element(element, md)
