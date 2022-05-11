@@ -1,11 +1,15 @@
+require 'cgi'
+
 class HypertextFromMyMarkdownParser < Object
 	attr_reader :results
+	LINE_BREAKS = "\n"
 	START_TABLE = '<table summary="">'
 	TABLE_HEADER = 'thead'
 
 	def initialize(markdown_text, attrs_hash={})
 		@attrs = {}
-		element_name, @attrs[:class], @attrs[:title], @attrs[:href],@attrs[:id] = attrs_hash['element_name'], attrs_hash['attr_class'], attrs_hash['link_title'], attrs_hash['href'], attrs_hash['attr_id']
+		element_name, @attrs[:class], @attrs[:title], @attrs[:href],@attrs[:id],@attrs[:role] = attrs_hash['element_name'], attrs_hash['attr_class'], attrs_hash['link_title'], attrs_hash['href'], attrs_hash['attr_id'],attrs_hash['role']
+		@attrs[:element_name] = element_name
 		@markdown_text = markdown_text.chomp
 		element_name = find_element(element_name, markdown_text) if element_name == nil
 		markdown_searches(markdown_text) #
@@ -14,12 +18,12 @@ class HypertextFromMyMarkdownParser < Object
 		@results = wrap_markdown(element_name, markdown_obj, @attrs)
 	end
 
-	def markdown_searches(md)
-		find_bold(md); find_emphasis(md); find_img(md); find_links(md); find_strong(md); find_tables(md)
+	def call
+		self.results
 	end
 
-	def find_element(element, md)
-		element = (md.scan(/^#/).count) == 1 || (md.scan(/ $/).count) == 1
+	def markdown_searches(md)
+		find_bold(md); find_emphasis(md); find_img(md); find_links(md); find_strong(md); find_tables(md)
 	end
 
 	def find_bold(markdown_text)
@@ -27,6 +31,9 @@ class HypertextFromMyMarkdownParser < Object
 		strong_html(matches) if matches
 	end
 
+	def find_element(element, md)
+		element = (md.scan(/^#/).count) == 1 || (md.scan(/ $/).count) == 1
+	end
 
 	def find_emphasis(markdown_text)
 		matches = markdown_text.match(/\*(.*)\*/)
@@ -58,9 +65,9 @@ class HypertextFromMyMarkdownParser < Object
 		element = (arr.shift == ' # ') ?  TABLE_HEADER : false
 		table_element_partial = !element ? '' : START_TABLE + '<' + element + '>'
 		# items = arr.compact.collect { |item| find_links(item) if item != nil }
-
 		attributes = @attrs[:id] ? " id=\"#{@attrs[:id]}\"" : ''
 		attributes += @attrs[:class] ? " class=\"#{@attrs[:class]}\"" : ''
+		attributes += @attrs[:role] ? " class=\"#{@attrs[:role]}\"" : ''
 		table_row = "<tr#{attributes}>"
 		html = table_element_partial + table_row + (arr.compact.collect { |item| '<td>' + item.strip + '</td>'   }.join) + "</tr>#{element ? '</' + element + '>' : '' }"
 		@markdown_text.gsub!(markdown, html)
@@ -78,6 +85,10 @@ class HypertextFromMyMarkdownParser < Object
 
 	def find_links(markdown_text)
 		link_matches = markdown_text.match(/\[(.*)\]\((.*)\)/)
+		# puts 'elemnt name', @attrs[:element_name], @attrs
+		if @element_name == 'a'
+			link_matches = { link_tag_name: @attrs[:element_name], href: @attrs[:href] }
+		end
 		link_html(markdown_text, link_matches) if link_matches
 	end
 
@@ -104,27 +115,27 @@ class HypertextFromMyMarkdownParser < Object
 	def split_title_arr(match_data)
 		attrs, title  = {}, match_data[2].split(' ')
 		url = title[0]
-		attrs['href'] = url
+		attrs[:href] = url
 		title = title[1..-1].join(' ')
 		title = title.length > 1 ? title.to_s : ''
 		if title.include?('external')
 			url = URI(url)
-			attrs['class'] = 'external'
-			attrs['domain'] = url.scheme  + '://' + url.host
+			attrs[:class] = 'external'
+			attrs[:domain] = url.scheme  + '://' + url.host
 		end
-		attrs['title'] = title if (title.length > 1)
+		attrs[:title] = title if (title.length > 1)
 		attrs
 	end
 
 	def link_html(text, match_data)
 		full_link = text.match(/\[(.*)\)/)[0]
 		attrs, element_attrs, text = split_title_arr(match_data),{},match_data[1]
-		['href','title', 'id', 'class'].each do |attr|
+		['href','title', 'id', 'class', 'role'].each do |attr|
 			element_attrs[attr] = attrs[attr] if attrs[attr]
 		end
 		element_and_attrs = element_attrs.collect { |attr, value| " #{attr}=\"#{value.gsub("'",'')}\"" }.join('')
-		external_domain = attrs['domain'] ? (' (' + attrs['domain'].gsub('https://','').gsub('www.','') + ')') : ''
-		link_text = "<a#{element_and_attrs}>#{text}</a>#{ external_domain }"
+		external_domain = attrs[:domain] ? (' (' + attrs[:domain].gsub('https://','') + ')') : ''
+		link_text = wrap_html({text: text}, 'a', attrs) + external_domain
 		@markdown_text.gsub!(full_link, link_text)
 	end
 
@@ -142,14 +153,15 @@ class HypertextFromMyMarkdownParser < Object
 		header_md = '#' * element_number
 		class_attr = text.scan(/^#{header_md}\.(\w+)/)
 		class_name = if class_attr.empty? 
-				''
+				{}
 			else 
 				class_attr = class_attr[0][0]
-				text.gsub!(".#{class_attr} ",'')
-				" class=\"#{class_attr}\""
+				text.gsub!(('.' + class_attr.to_s),'')
+				{ class: class_attr.to_s }
 			end
 		plain_text = text[element_number..-1].strip
-		"<#{element}#{class_name}>#{plain_text}</#{element}>"
+		# "<#{element}#{class_name}>#{plain_text}</#{element}>"
+		wrap_html({text: plain_text}, element, class_name)
 	end
 
 	def multi_header_html(text)
@@ -157,7 +169,7 @@ class HypertextFromMyMarkdownParser < Object
 	end
 
 	def header_html(obj)
-		if obj[:length] == 0
+		if obj[:length] == 0 
 			single_header_html(obj[:text])
 		elsif obj[:length] == 1
 			multi_header_html(obj[:text])
@@ -172,13 +184,30 @@ class HypertextFromMyMarkdownParser < Object
 		text[1..-1]
 	end
 
-	def wrap_html(obj, element_name, attrs)
-		element_attrs = ''
-		element_attrs += " id=\"#{attrs[:id]}\"" if attrs[:id]
-		element_attrs += " class=\"#{attrs[:class]}\"" if attrs[:class]
-		element_attrs += " href=\"#{attrs[:href]}\"" if attrs[:href]
-		obj[:text].split("\n").collect do |element_text|
-			"<#{element_name}#{element_attrs}>#{element_text}</#{element_name}>"
-		end.join
+	def sp_wrapper(obj)
+		# "\"#{obj}\""
+		'"' + obj + '"'
 	end
+
+	def wrap_html(obj, element_name, attrs)
+		text = obj[:text]
+		element_attrs = ''
+		element_attrs += ' id=' + sp_wrapper(attrs[:id]) if attrs[:id]
+		element_attrs += ' class=' + sp_wrapper(attrs[:class]) if attrs[:class]
+		element_attrs += ' href=' + sp_wrapper(attrs[:href]) if attrs[:href]
+		element_attrs += ' href=' + sp_wrapper(attrs['href'])  if attrs['href']
+		element_attrs += ' role=' + sp_wrapper(attrs[:role]) if attrs[:role]
+		element_attrs += ' title=' + sp_wrapper(attrs[:title]) if attrs[:title]
+		if text.include?(LINE_BREAKS)
+			text.split().collect do |element_text|
+				"<#{element_name }#{element_attrs}>#{element_text}</#{element_name}>"
+			end.join
+		else
+			"<#{element_name}#{element_attrs}>#{text}</#{element_name}>"
+		end
+	end
+end
+
+def parse_markdown(markdown, objects)
+	HypertextFromMyMarkdownParser.new(markdown, objects).results
 end
