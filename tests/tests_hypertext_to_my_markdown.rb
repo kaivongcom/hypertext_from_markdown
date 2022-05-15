@@ -32,6 +32,7 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 
 	def test_for_attrs_with_img
 		md = "![pop tarts](/images/notes/square/20.png),  { element_name: 'a', link_title: 'computer game shop', href: 'https://kaivong.com' }"
+
 	end
 
 	def test_complex_link
@@ -85,6 +86,17 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal_of_parser("A First Level Header\n ====================", '<h1>A First Level Header</h1>')
 	end
 
+	def test_complex_string_with_inline_html
+		inline_html = 'My Chinese name is, <strong lang="zh_CN" title="Chinese">黃振佳</strong>. I''m the mix of British-Chinese (see <a href="/about/contact/digital-identity">digital-identity</a> for more). '
+		html = '<p>' + inline_html + '</p>'
+		assert_equal_of_parser(inline_html, html)
+	end
+
+	def test_for_h1_wrapped
+		assert_equal_of_parser("# A First Level Header", '<h1>A First Level Header</h1>', true)
+	end
+
+
 	def test_for_h4_class_name
 		markdown =  HypertextFromMyMarkdownParser.new("####.tidy a title").results
 		output_html_desired = '<h4 class="tidy">a title</h4>'	
@@ -127,10 +139,10 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 	end
 
 	def test_img_html
-		markdown_image = '![computer game shop](http://www.kaivong.com/images/square/515.jpg)'
-		attrs = {element_name: false, link_title: 'computer game shop'} # alt
+		markdown_image = '![computer game shop](http://www.kaivong.com/images/square/515.jpg #games-shop)'
+		attrs = {element_name: false, 'attr_id' => 'games-shop', link_title: 'computer game shop'} # alt
 		markdown = HypertextFromMyMarkdownParser.new(markdown_image, attrs).results
-		actual_expected = '<img alt="computer game shop" src="http://www.kaivong.com/images/square/515.jpg">'
+		actual_expected = '<img alt="computer game shop" id="games-shop" src="http://www.kaivong.com/images/square/515.jpg">'
 		assert_equal(actual_expected, markdown)
 	end
 

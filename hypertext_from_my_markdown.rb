@@ -46,7 +46,8 @@ class HypertextFromMyMarkdownParser < Object
 	end
 
 	def html_img(matches)
-		image = "<img alt=\"#{matches[1]}\" src=\"#{matches[2]}\">"
+		src, id = matches[2].split(' #')
+		image = "<img alt=\"#{matches[1]}\" id=\"#{id}\" src=\"#{src}\">"
 		@markdown_text.gsub!(matches[0], image)
 	end
 
