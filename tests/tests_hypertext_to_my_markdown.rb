@@ -138,11 +138,32 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal_of_parser(original, expected, true, attrs[:attr_class])
 	end
 
-	def test_img_html
+	def test_img_html_basic
+		markdown_image = '![computer game shop](http://www.kaivong.com/images/square/515.jpg #games-shop)'
+		markdown = HypertextFromMyMarkdownParser.new(markdown_image).results
+		actual_expected = '<img alt="computer game shop" id="games-shop" loading="eager" src="http://www.kaivong.com/images/square/515.jpg">'
+		assert_equal(actual_expected, markdown)
+	end
+
+	def test_img_html_with_dimension_is_landscape
+		markdown_image = '![computer game shop](http://www.kaivong.com/images/square/515.jpg^400x200 #games-shop)'
+		markdown = HypertextFromMyMarkdownParser.new(markdown_image).results
+		actual_expected = '<img alt="computer game shop" height="200" id="games-shop" loading="eager" src="http://www.kaivong.com/images/square/515.jpg" width="400">'
+		assert_equal(actual_expected, markdown)
+	end
+
+	def test_img_html_with_dimension_is_portrait
+		markdown_image = '![computer game shop](http://www.kaivong.com/images/square/515.jpg^200x400 #games-shop)'
+		markdown = HypertextFromMyMarkdownParser.new(markdown_image).results
+		actual_expected = '<img alt="computer game shop" height="400" id="games-shop" loading="eager" src="http://www.kaivong.com/images/square/515.jpg" width="200">'
+		assert_equal(actual_expected, markdown)
+	end
+
+	def test_img_html_with_attrs
 		markdown_image = '![computer game shop](http://www.kaivong.com/images/square/515.jpg #games-shop)'
 		attrs = {element_name: false, 'attr_id' => 'games-shop', link_title: 'computer game shop'} # alt
 		markdown = HypertextFromMyMarkdownParser.new(markdown_image, attrs).results
-		actual_expected = '<img alt="computer game shop" id="games-shop" src="http://www.kaivong.com/images/square/515.jpg">'
+		actual_expected = '<img alt="computer game shop" id="games-shop" loading="eager" src="http://www.kaivong.com/images/square/515.jpg">'
 		assert_equal(actual_expected, markdown)
 	end
 
