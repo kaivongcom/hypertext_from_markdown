@@ -23,7 +23,7 @@ class HypertextFromMyMarkdownParser < Object
 	end
 
 	def markdown_searches(md)
-		find_bold(md); find_emphasis(md); find_img(md); find_links(md); find_strong(md); find_tables(md)
+		find_bold(md); find_emphasis(md); find_img(md); find_links(md); find_list(md); find_strong(md); find_tables(md)
 	end
 
 	def find_bold(markdown_text)
@@ -59,6 +59,17 @@ class HypertextFromMyMarkdownParser < Object
 		image = "<img alt=\"#{matches[1]}\""+ height + "id=\"#{id}\" loading=\"eager\" src=\"#{src}\"" + width+ ">"
 		
 		@markdown_text.gsub!(matches[0], image)
+	end
+
+	def find_list(markdown_text)
+		matches = markdown_text.match(/^\*\s(.*)/)
+		html_list(matches) if matches
+	end
+
+	def html_list(matches)
+		li_html = matches[1]
+		@attrs[:element_name] = 'li'
+		@markdown_text =  li_html
 	end
 
 	def find_strong(markdown_text)
@@ -109,6 +120,8 @@ class HypertextFromMyMarkdownParser < Object
 		elsif element == true
 			if @markdown_text.match(/^#|====/)
 				header_html(markdown)
+			elsif @attrs[:element_name] == 'li'
+				wrap_html(markdown, @attrs[:element_name], attrs)
 			else
 				paragraph_html(markdown, attrs)
 			end

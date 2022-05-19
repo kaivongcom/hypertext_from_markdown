@@ -8,6 +8,16 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal(expected, actual_expected)
 	end
 
+	def test_for_lists
+		actual = "* example item in list"
+		assert_equal_of_parser(actual, '<li>example item in list</li>')
+	end
+
+	def test_for_lists_with_additional_html # find some kind of err ... from ascii or otherwise? eg. * Dressipi <small>&#x28;https://www.dressipi.com&#x29;</small>
+		actual = "* example item <small>in list</small>"
+		assert_equal_of_parser(actual, '<li>example item <small>in list</small></li>')
+	end
+
 	def test_for_anchor_link_text
 		actual_expected = "[home page](/example)"
 		assert_equal_of_parser(actual_expected, '<a href="/example">home page</a>', false)
