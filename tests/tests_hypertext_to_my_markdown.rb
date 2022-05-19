@@ -8,6 +8,13 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal(expected, actual_expected)
 	end
 
+	def test_markdown_from_a_MARKUP # image markup to markdown 
+		markdown = "![alt text here](/example/picture.jpg^100x120 #example-id)"
+		html_image = '<img alt="alt text here" height="120" id="example-id" src="/example/picture.jpg" width="100">'
+		test_markdown_parser = HypertextFromMyMarkdownParser.new(html_image, { 'html' => true }).results
+		assert_equal(markdown,test_markdown_parser)
+	end
+
 	def test_for_lists
 		actual = "* example item in list"
 		assert_equal_of_parser(actual, '<li>example item in list</li>')

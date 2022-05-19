@@ -7,15 +7,25 @@ class HypertextFromMyMarkdownParser < Object
 	TABLE_HEADER = 'thead'
 
 	def initialize(markdown_text, attrs_hash={})
-		@attrs = {}
-		element_name, @attrs[:class], @attrs[:title], @attrs[:href],@attrs[:id],@attrs[:role] = attrs_hash['element_name'], attrs_hash['attr_class'], attrs_hash['link_title'], attrs_hash['href'], attrs_hash['attr_id'],attrs_hash['role']
-		@attrs[:element_name] = element_name
-		@markdown_text = markdown_text.chomp
-		element_name = find_element(element_name, markdown_text) if element_name == nil
-		markdown_searches(markdown_text) #
-		length = @markdown_text.scan(/\n/).count
-		markdown_obj = { text: @markdown_text, length: length }
-		@results = wrap_markdown(element_name, markdown_obj, @attrs)
+		if attrs_hash['html']
+			@results = markdown_from_markup(markdown_text, attrs_hash)
+		else
+			@attrs = {}
+			element_name, @attrs[:class], @attrs[:title], @attrs[:href],@attrs[:id],@attrs[:role] = attrs_hash['element_name'], attrs_hash['attr_class'], attrs_hash['link_title'], attrs_hash['href'], attrs_hash['attr_id'],attrs_hash['role']
+			@attrs[:element_name] = element_name
+			@markdown_text = markdown_text.chomp
+			element_name = find_element(element_name, markdown_text) if element_name == nil
+			markdown_searches(markdown_text) #
+			length = @markdown_text.scan(/\n/).count
+			markdown_obj = { text: @markdown_text, length: length }
+			@results = wrap_markdown(element_name, markdown_obj, @attrs)
+		end
+	end
+
+	def markdown_from_markup(text, attrs)
+		html_image = '<img alt="alt text here" height="120" id="example-id" src="/example/picture.jpg" width="100">'
+		element, alt, height_key, height, id_key, id, src_key, src, width_key, width = text.split('"')
+		"![#{alt}](#{ src + '^' + width + 'x' + height + ' #' + id })"
 	end
 
 	def call
