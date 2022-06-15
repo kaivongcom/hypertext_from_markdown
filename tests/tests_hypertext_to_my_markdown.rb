@@ -30,6 +30,23 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 		assert_equal_of_parser(actual_expected, '<a href="/example">home page</a>', false)
 	end
 
+	def test_for_anchor_link_text_with_extra_grammar
+		actual_expected = "[home page](/example) from (that homepage)"
+		assert_equal_of_parser(actual_expected, '<a href="/example">home page</a> from (that homepage)', false)
+	end
+
+	def test_strange_parsing_in_menubar
+		actual_expected = '<td class=\"#{text}\">#{text_link}</td>'
+		assert_equal_of_parser(actual_expected, '<td class=\"#{text}\">#{text_link}</td>', false) # actually testing unparsed ERB.HTML
+	end
+
+	def test_markdown_link_with_icon_link
+		actual_expected = "[!iconLink](#example)"
+		html_link = '<a href="#example"><i class="bi bi-link-45deg" title="icon link"></i> <span class="link-text">(link)</span></a>'
+		assert_equal_of_parser(actual_expected, html_link, false)
+	end
+
+
 	def test_for_anchor_link_text_within_text
 		test = { markdown: 'Link to [Google](http://google.com)', html: 'Link to <a href="http://google.com">Google</a>' }
 		assert_equal_of_parser(test[:markdown], test[:html], false)
@@ -104,9 +121,15 @@ class TestHypertextFromMyMarkdownParser < Test::Unit::TestCase
 	end
 
 	def test_complex_string_with_inline_html
-		inline_html = 'My Chinese name is, <strong lang="zh_CN" title="Chinese">黃振佳</strong>. I''m the mix of British-Chinese (see <a href="/about/contact/digital-identity">digital-identity</a> for more). '
+		inline_html = 'My Chinese name is, <strong lang="zh_CN" title="Chinese">黃振佳</strong>. I''m the mix of British-Chinese (see <a href="/about/contact/digital-identity">digital-identity</a> for more).'
 		html = '<p>' + inline_html + '</p>'
 		assert_equal_of_parser(inline_html, html)
+	end
+
+	def test_strong_with_attrs
+		actual = 'My Chinese name is, **^zh_CN^Chinese^黃振佳**.'
+		expected = '<p>My Chinese name is, <strong lang="zh_CN" title="Chinese">黃振佳</strong>.</p>'
+		assert_equal_of_parser(actual, expected)
 	end
 
 	def test_for_h1_wrapped
