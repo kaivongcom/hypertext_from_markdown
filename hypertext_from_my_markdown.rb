@@ -1,3 +1,4 @@
+require 'uri'
 class HypertextFromMyMarkdownParser < Object
 	attr_reader :results
 	LINE_BREAKS = "\n"
