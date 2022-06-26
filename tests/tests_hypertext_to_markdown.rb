@@ -283,8 +283,9 @@ class TestHyperTextFromMarkdownParser < Test::Unit::TestCase
 
 	def test_label_element
 		md = "here is a label"
+		md_parsed = HyperTextFromMarkdownParser.new(md, 'label' ).results
 		html = '<label>here is a label</label>'
-		assert_equal_of_parser(md, html, 'label')
+		assert_equal(md_parsed, html)
 	end
 
 

@@ -10,14 +10,12 @@ class HyperTextFromMarkdownParser < Object
 	TABLE_HEADER = 'thead'
 
 	def initialize(markdown_text, attrs_hash={})
-		if String == attrs_hash.class
-			@attrs_hash = { 'element_name' => attrs_hash }
-		end
+		attrs_hash = { 'html_element' => attrs_hash } if String == attrs_hash.class
 		if attrs_hash['html'] # pure HTML (is this a lint?)
 			@results = markdown_from_markup(markdown_text, attrs_hash)
 		else
 			@attrs = make_attrs(attrs_hash)
-			@attrs[:element_name] = element_name = attrs_hash['element_name']
+			@attrs[:element_name] = element_name = attrs_hash['html_element'] || attrs_hash['element_name']
 			@markdown_text = markdown_text.chomp
 			element_name = find_element(element_name, @markdown_text) if element_name == nil
 			length = @markdown_text.scan(/\n/).count
