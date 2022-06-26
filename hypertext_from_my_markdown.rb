@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 require 'uri'
 class HypertextFromMyMarkdownParser < Object
+=======
+class HyperTextFromMarkdownParser < Object
+>>>>>>> 5165a10 (change name)
 	attr_reader :results
 	LINE_BREAKS = "\n"
 	START_TABLE = '<table summary="">'
@@ -245,7 +249,7 @@ class HypertextFromMyMarkdownParser < Object
 		'"' + obj + '"'
 	end
 
-	def wrap_html(obj, element_name, attrs)
+	def wrap_html(obj, element_name, attrs
 		text = obj[:text]
 		element_attrs = ''
 		element_attrs += ' id=' + sp_wrapper(attrs[:id]) if attrs[:id]
@@ -256,7 +260,8 @@ class HypertextFromMyMarkdownParser < Object
 		element_attrs += ' role=' + sp_wrapper(attrs[:role]) if attrs[:role]
 		element_attrs += ' title=' + sp_wrapper(attrs[:title]) if attrs[:title]
 		if text.include?(LINE_BREAKS)
-			text.split().collect do |element_text|
+			text.split().collect do |element_text|sublsd	
+
 				"<#{element_name }#{element_attrs}>#{element_text}</#{element_name}>"
 			end.join
 		else
@@ -266,5 +271,5 @@ class HypertextFromMyMarkdownParser < Object
 end
 
 def parse_markdown(markdown, objects)
-	HypertextFromMyMarkdownParser.new(markdown, objects).results
+	HyperTextFromMarkdownParser.new(markdown, objects).results
 end
