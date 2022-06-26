@@ -10,7 +10,10 @@ class HyperTextFromMarkdownParser < Object
 	TABLE_HEADER = 'thead'
 
 	def initialize(markdown_text, attrs_hash={})
-		if attrs_hash['html']
+		if String == attrs_hash.class
+			@attrs_hash = { 'element_name' => attrs_hash }
+		end
+		if attrs_hash['html'] # pure HTML (is this a lint?)
 			@results = markdown_from_markup(markdown_text, attrs_hash)
 		else
 			@attrs = make_attrs(attrs_hash)
@@ -249,7 +252,7 @@ class HyperTextFromMarkdownParser < Object
 		'"' + obj + '"'
 	end
 
-	def wrap_html(obj, element_name, attrs
+	def wrap_html(obj, element_name, attrs)
 		text = obj[:text]
 		element_attrs = ''
 		element_attrs += ' id=' + sp_wrapper(attrs[:id]) if attrs[:id]
