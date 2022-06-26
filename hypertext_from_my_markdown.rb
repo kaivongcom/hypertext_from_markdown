@@ -5,7 +5,7 @@ class HypertextFromMyMarkdownParser < Object
 class HyperTextFromMarkdownParser < Object
 >>>>>>> 5165a10 (change name)
 	attr_reader :results
-	LINE_BREAKS = "\n"
+	NEW_LINE = "\n"
 	START_TABLE = '<table summary="">'
 	TABLE_HEADER = 'thead'
 
@@ -260,8 +260,8 @@ class HyperTextFromMarkdownParser < Object
 		element_attrs += ' lang=' + sp_wrapper(attrs[:lang]) if attrs[:lang]
 		element_attrs += ' role=' + sp_wrapper(attrs[:role]) if attrs[:role]
 		element_attrs += ' title=' + sp_wrapper(attrs[:title]) if attrs[:title]
-		if text.include?(LINE_BREAKS)
-			text.split().collect do |element_text|sublsd	
+		if text.include?(NEW_LINE)
+			text.split().collect do |element_text|	
 
 				"<#{element_name }#{element_attrs}>#{element_text}</#{element_name}>"
 			end.join
