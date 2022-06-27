@@ -1,5 +1,5 @@
 require "test/unit"
-require_relative "../hypertext_from_my_markdown"
+require_relative "../hypertext_from_markdown"
 
 class TestHyperTextFromMarkdownParser < Test::Unit::TestCase
 	def assert_equal_of_parser(original, html, wrapper_element=true, attr_class=false, attr_id=false, link_title=false)
