@@ -31,7 +31,6 @@ class HyperTextFromMarkdown < Object
 	end
 
 	def markdown_from_markup(text, attrs)
-		# html_image_example = '<img alt="alt text here" height="120" id="example-id" src="/example/picture.jpg" width="100">'
 		element, alt, height_key, height, id_key, id, src_key, src, width_key, width = text.split('"')
 		"![#{alt}](#{ src + '^' + width + 'x' + height + ' #' + id })" # html img from markdown ![alt-text](src ^args)
 	end
