@@ -5,8 +5,8 @@ class HyperTextFromMarkdown < Object
 	NEW_LINE = "\n"
 	HTML_TABLE = 'table'
 	HTML_TABLE_DATA = 'td'
-	HTML_TABLE_ROW = 'tr'
 	HTML_TABLE_HEADER = 'thead'
+	HTML_TABLE_ROW = 'tr'
 
 	def initialize(markdown_text, attrs_hash={})
 		attrs_hash = { 'html_element' => attrs_hash } if String == attrs_hash.class
