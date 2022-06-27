@@ -2,11 +2,12 @@ require 'uri'
 class HyperTextFromMarkdown < Object
 	attr_reader :results
 	CLOSE_TABLE = '</table>'
-	NEW_LINE = "\n"
+	HTML_LIST_ITEM = 'li'
 	HTML_TABLE = 'table'
 	HTML_TABLE_DATA = 'td'
 	HTML_TABLE_HEADER = 'thead'
 	HTML_TABLE_ROW = 'tr'
+	NEW_LINE = "\n"
 
 	def initialize(markdown_text, attrs_hash={})
 		attrs_hash = { 'html_element' => attrs_hash } if String == attrs_hash.class
@@ -92,7 +93,7 @@ class HyperTextFromMarkdown < Object
 
 	def html_list(matches)
 		li_html = matches[1]
-		@attrs[:element_name] = 'li'
+		@attrs[:element_name] = HTML_LIST_ITEM 
 		@markdown_text =  li_html
 	end
 
@@ -193,10 +194,6 @@ class HyperTextFromMarkdown < Object
 		potential_link = potential_link ? potential_link + ')' : text
 		full_link = potential_link.match(/\[(.*)\)/)[0]
 		attrs, element_attrs, text = split_title_arr(match_data),{},match_data[1]
-		['href','title', 'id', 'class', 'role', 'summary'].each do |attr|
-			element_attrs[attr] = attrs[attr] if attrs[attr]
-		end
-		element_and_attrs = element_attrs.collect { |attr, value| " #{attr}=\"#{value.gsub("'",'')}\"" }.join('')
 		external_domain = attrs[:domain] ? (' (' + attrs[:domain].gsub('https://','') + ')') : ''
 		if text.include?('!iconLink')
 			icon_link = "<span class=\"link-text\">(link)</span>"
