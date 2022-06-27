@@ -7,7 +7,7 @@ class HyperTextFromMarkdown < Object
 
 	def initialize(markdown_text, attrs_hash={})
 		attrs_hash = { 'html_element' => attrs_hash } if String == attrs_hash.class
-		if attrs_hash['html'] || attrs_hash['html_img']
+		if attrs_hash['html_img']
 			@results = markdown_from_markup(markdown_text, attrs_hash)
 		else
 			@attrs = make_attrs(attrs_hash)
