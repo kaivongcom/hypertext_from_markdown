@@ -1,9 +1,10 @@
 require 'uri'
 class HyperTextFromMarkdown < Object
 	attr_reader :results
+	CLOSE_TABLE = '</table>'
 	NEW_LINE = "\n"
-	START_TABLE = '<table summary="">'
-	TABLE_HEADER = 'thead'
+	HTML_TABLE = 'table'
+	HTML_TABLE_HEADER = 'thead'
 
 	def initialize(markdown_text, attrs_hash={})
 		attrs_hash = { 'html_element' => attrs_hash } if String == attrs_hash.class
@@ -27,6 +28,7 @@ class HyperTextFromMarkdown < Object
 			:href => attrs['href'],
 			:id => attrs['attr_id'],
 			:role => attrs['role'],
+			:summary => attrs['summary'],
 			:title => attrs['link_title'] }
 	end
 
@@ -109,16 +111,20 @@ class HyperTextFromMarkdown < Object
 
 	def table_html(arr, markdown)
 		arr.shift
-		element = (arr.shift == ' # ') ?  TABLE_HEADER : false
-		table_element_partial = !element ? '' : START_TABLE + '<' + element + '>'
+		table_wrapper = (arr.shift == ' # ') ?  HTML_TABLE_HEADER : false
+		# table_element_partial = !element ? '' : START_TABLE + '<' + element + '>'
 		attributes = {'attr_class' => @attrs[:class],
 					  'attr_id' => @attrs[:id],
 					  'element_name' => 'tr',
 					  'role' => @attrs[:role]}
-		td_items = (arr.compact.collect { |item| '<td>' + item.strip + '</td>'   }.join)
-		table_row = HyperTextFromMarkdown.new(td_items, attributes ).results
-		html = table_element_partial + table_row + "#{element ? '</' + element + '>' : '' }"
-		@markdown_text.gsub!(markdown, html)
+		td_items = (arr.compact.collect { |item| parse_markdown(item.strip, 'td') }.join)
+		html = table_row = parse_markdown(td_items, attributes)
+		if @attrs['element_name'] == HTML_TABLE || table_wrapper
+			table_head = parse_markdown(table_row, { 'element_name' => HTML_TABLE_HEADER })
+			html = parse_markdown(table_head, { 'element_name' => HTML_TABLE, 'summary' => '' })
+			html = html.gsub(CLOSE_TABLE,'')
+		end
+		@markdown_text.gsub!(markdown, html )
 	end
 
 	def strong_html(strong_matches, attrs={})
@@ -186,7 +192,7 @@ class HyperTextFromMarkdown < Object
 		potential_link = potential_link ? potential_link + ')' : text
 		full_link = potential_link.match(/\[(.*)\)/)[0]
 		attrs, element_attrs, text = split_title_arr(match_data),{},match_data[1]
-		['href','title', 'id', 'class', 'role'].each do |attr|
+		['href','title', 'id', 'class', 'role', 'summary'].each do |attr|
 			element_attrs[attr] = attrs[attr] if attrs[attr]
 		end
 		element_and_attrs = element_attrs.collect { |attr, value| " #{attr}=\"#{value.gsub("'",'')}\"" }.join('')
@@ -254,6 +260,7 @@ class HyperTextFromMarkdown < Object
 		element_attrs += ' href=' + sp_wrapper(attrs['href'])  if attrs['href']
 		element_attrs += ' lang=' + sp_wrapper(attrs[:lang]) if attrs[:lang]
 		element_attrs += ' role=' + sp_wrapper(attrs[:role]) if attrs[:role]
+		element_attrs += ' summary=' + sp_wrapper(attrs[:summary]) if attrs[:summary]
 		element_attrs += ' title=' + sp_wrapper(attrs[:title]) if attrs[:title]
 		if text.include?(NEW_LINE)
 			text.split().collect do |element_text|	
