@@ -4,6 +4,8 @@ class HyperTextFromMarkdown < Object
 	CLOSE_TABLE = '</table>'
 	NEW_LINE = "\n"
 	HTML_TABLE = 'table'
+	HTML_TABLE_DATA = 'td'
+	HTML_TABLE_ROW = 'tr'
 	HTML_TABLE_HEADER = 'thead'
 
 	def initialize(markdown_text, attrs_hash={})
@@ -115,9 +117,9 @@ class HyperTextFromMarkdown < Object
 		# table_element_partial = !element ? '' : START_TABLE + '<' + element + '>'
 		attributes = {'attr_class' => @attrs[:class],
 					  'attr_id' => @attrs[:id],
-					  'element_name' => 'tr',
+					  'element_name' => HTML_TABLE_ROW,
 					  'role' => @attrs[:role]}
-		td_items = (arr.compact.collect { |item| parse_markdown(item.strip, 'td') }.join)
+		td_items = (arr.compact.collect { |item| parse_markdown(item.strip, HTML_TABLE_DATA) }.join)
 		html = table_row = parse_markdown(td_items, attributes)
 		if @attrs['element_name'] == HTML_TABLE || table_wrapper
 			table_head = parse_markdown(table_row, { 'element_name' => HTML_TABLE_HEADER })
