@@ -126,7 +126,7 @@ class HyperTextFromMarkdown < Object
 			html = parse_markdown(table_head, { 'element_name' => HTML_TABLE, 'summary' => '' })
 			html = html.gsub(CLOSE_TABLE,'')
 		end
-		@markdown_text.gsub!(markdown, html )
+		@markdown_text.gsub!(markdown, html)
 	end
 
 	def strong_html(strong_matches, attrs={})

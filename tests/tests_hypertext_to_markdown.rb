@@ -234,7 +234,7 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 
 	def test_for_tables_header
 		original = '| # | name1 | name2 | name3 |'
-		expected = '<table summary=""><thead><tr><td>name1</td><td>name2</td><td>name3</td></tr></thead>'
+		expected = '<table summary=""><thead><tr><td>name1</td><td>name2</td><td>name3</td></tr></thead>' # expects more tr to follow
 		attrs = { element_name: false, attr_class: '' }
 		assert_equal_of_parser(original, expected, attrs[:element_name])
 	end
