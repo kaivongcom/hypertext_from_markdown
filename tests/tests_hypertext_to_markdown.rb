@@ -12,6 +12,7 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		markdown = "![alt text here](/example/picture.jpg^100x120 #example-id)"
 		html_image = '<img alt="alt text here" height="120" id="example-id" src="/example/picture.jpg" width="100">'
 		test_markdown_parser = HyperTextFromMarkdown.new(html_image, { 'html' => true }).results
+		test_markdown_parser = HyperTextFromMarkdown.new(html_image, { 'html_img' => true }).results
 		assert_equal(markdown,test_markdown_parser)
 	end
 
