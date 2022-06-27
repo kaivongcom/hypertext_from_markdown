@@ -80,7 +80,6 @@ class HyperTextFromMarkdown < Object
 			height = ' height="' + height + '" '
 			width = ' width="' + width + '"'
 		end
-		# placeholder=\"placeholder-.gif\"  nextjs.org lies...
 		attrs = ""
 		image = "<img alt=\"#{matches[1]}\""+ height + "id=\"#{id}\" loading=\"eager\" src=\"#{src}\"" + width+ ">"
 		@markdown_text.gsub!(matches[0], image)
