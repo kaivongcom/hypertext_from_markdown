@@ -1,5 +1,5 @@
 require 'uri'
-class HyperTextFromMarkdownParser < Object
+class HyperTextFromMarkdown < Object
 	attr_reader :results
 	NEW_LINE = "\n"
 	START_TABLE = '<table summary="">'
@@ -268,5 +268,5 @@ class HyperTextFromMarkdownParser < Object
 end
 
 def parse_markdown(markdown, objects)
-	HyperTextFromMarkdownParser.new(markdown, objects).results
+	HyperTextFromMarkdown.new(markdown, objects).results
 end
