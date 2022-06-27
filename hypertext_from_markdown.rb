@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 require 'uri'
-class HypertextFromMyMarkdownParser < Object
-=======
 class HyperTextFromMarkdownParser < Object
->>>>>>> 5165a10 (change name)
 	attr_reader :results
 	NEW_LINE = "\n"
 	START_TABLE = '<table summary="">'
