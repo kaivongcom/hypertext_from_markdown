@@ -1,16 +1,21 @@
+<<<<<<< HEAD
 require 'uri'
 class HypertextFromMyMarkdownParser < Object
+=======
+class HyperTextFromMarkdownParser < Object
+>>>>>>> 5165a10 (change name)
 	attr_reader :results
-	LINE_BREAKS = "\n"
+	NEW_LINE = "\n"
 	START_TABLE = '<table summary="">'
 	TABLE_HEADER = 'thead'
 
 	def initialize(markdown_text, attrs_hash={})
-		if attrs_hash['html']
+		attrs_hash = { 'html_element' => attrs_hash } if String == attrs_hash.class
+		if attrs_hash['html'] # pure HTML (is this a lint?)
 			@results = markdown_from_markup(markdown_text, attrs_hash)
 		else
 			@attrs = make_attrs(attrs_hash)
-			@attrs[:element_name] = element_name = attrs_hash['element_name']
+			@attrs[:element_name] = element_name = attrs_hash['html_element'] || attrs_hash['element_name']
 			@markdown_text = markdown_text.chomp
 			element_name = find_element(element_name, @markdown_text) if element_name == nil
 			length = @markdown_text.scan(/\n/).count
@@ -255,8 +260,9 @@ class HypertextFromMyMarkdownParser < Object
 		element_attrs += ' lang=' + sp_wrapper(attrs[:lang]) if attrs[:lang]
 		element_attrs += ' role=' + sp_wrapper(attrs[:role]) if attrs[:role]
 		element_attrs += ' title=' + sp_wrapper(attrs[:title]) if attrs[:title]
-		if text.include?(LINE_BREAKS)
-			text.split().collect do |element_text|
+		if text.include?(NEW_LINE)
+			text.split().collect do |element_text|	
+
 				"<#{element_name }#{element_attrs}>#{element_text}</#{element_name}>"
 			end.join
 		else
@@ -266,5 +272,5 @@ class HypertextFromMyMarkdownParser < Object
 end
 
 def parse_markdown(markdown, objects)
-	HypertextFromMyMarkdownParser.new(markdown, objects).results
+	HyperTextFromMarkdownParser.new(markdown, objects).results
 end
