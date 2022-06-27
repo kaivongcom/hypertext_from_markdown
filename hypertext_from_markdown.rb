@@ -111,17 +111,17 @@ class HyperTextFromMarkdown < Object
 		arr.shift
 		element = (arr.shift == ' # ') ?  TABLE_HEADER : false
 		table_element_partial = !element ? '' : START_TABLE + '<' + element + '>'
-		# items = arr.compact.collect { |item| find_links(item) if item != nil }
-		attributes = @attrs[:id] ? " id=\"#{@attrs[:id]}\"" : ''
-		attributes += @attrs[:class] ? " class=\"#{@attrs[:class]}\"" : ''
-		attributes += @attrs[:role] ? " class=\"#{@attrs[:role]}\"" : ''
-		table_row = "<tr#{attributes}>"
-		html = table_element_partial + table_row + (arr.compact.collect { |item| '<td>' + item.strip + '</td>'   }.join) + "</tr>#{element ? '</' + element + '>' : '' }"
+		attributes = {'attr_class' => @attrs[:class],
+					  'attr_id' => @attrs[:id],
+					  'element_name' => 'tr',
+					  'role' => @attrs[:role]}
+		td_items = (arr.compact.collect { |item| '<td>' + item.strip + '</td>'   }.join)
+		table_row = HyperTextFromMarkdown.new(td_items, attributes ).results
+		html = table_element_partial + table_row + "#{element ? '</' + element + '>' : '' }"
 		@markdown_text.gsub!(markdown, html)
 	end
 
 	def strong_html(strong_matches, attrs={})
-		# strong_html = "<strong>#{strong_matches[1]}</strong>"
 		element_text = strong_matches[1]
 		element_text = strong_matches[1].gsub("^#{attrs[:lang]}^#{attrs[:title]}^",'') if !attrs.empty?
 		strong_html = wrap_html({text: element_text},'strong',attrs)
@@ -257,7 +257,6 @@ class HyperTextFromMarkdown < Object
 		element_attrs += ' title=' + sp_wrapper(attrs[:title]) if attrs[:title]
 		if text.include?(NEW_LINE)
 			text.split().collect do |element_text|	
-
 				"<#{element_name }#{element_attrs}>#{element_text}</#{element_name}>"
 			end.join
 		else
