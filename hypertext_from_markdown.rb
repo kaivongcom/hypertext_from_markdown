@@ -259,15 +259,10 @@ class HyperTextFromMarkdown < Object
 
 	def wrap_html(obj, element_name, attrs)
 		text = obj[:text]
-		element_attrs = ''
-		element_attrs += ' id=' + sp_wrapper(attrs[:id]) if attrs[:id]
-		element_attrs += ' class=' + sp_wrapper(attrs[:class]) if attrs[:class]
-		element_attrs += ' href=' + sp_wrapper(attrs[:href]) if attrs[:href]
-		element_attrs += ' href=' + sp_wrapper(attrs['href'])  if attrs['href']
-		element_attrs += ' lang=' + sp_wrapper(attrs[:lang]) if attrs[:lang]
-		element_attrs += ' role=' + sp_wrapper(attrs[:role]) if attrs[:role]
-		element_attrs += ' summary=' + sp_wrapper(attrs[:summary]) if attrs[:summary]
-		element_attrs += ' title=' + sp_wrapper(attrs[:title]) if attrs[:title]
+		element_attrs = String.new
+		['id', 'class', 'href', 'lang', 'role', 'summary', 'title'].each do |attr|
+			element_attrs += " #{attr}=" + sp_wrapper(attrs[attr.to_sym]) if attrs[attr.to_sym]
+		end
 		if text.include?(NEW_LINE)
 			text.split().collect do |element_text|	
 				"<#{element_name }#{element_attrs}>#{element_text}</#{element_name}>"
