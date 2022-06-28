@@ -190,7 +190,6 @@ class HyperTextFromMarkdown < Object
 		potential_link = markdown_text.split(")")[0]
 		potential_link = potential_link ? potential_link + ')' : markdown_text
 		link_matches = potential_link.match(/\[(.*)\]\((.*)\)/)
-		# puts 'elemnt name', @attrs[:element_name], @attrs
 		if @element_name == 'a'
 			link_matches = { link_tag_name: @attrs[:element_name], href: @attrs[:href] }
 		end
