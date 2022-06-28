@@ -8,7 +8,7 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		assert_equal(expected, actual_expected)
 	end
 
-	def test_markdown_from_a_MARKUP # image markup to markdown 
+	def test_markdown_from_a_MARKUP # image markup to markdown
 		markdown = "![alt text here](/example/picture.jpg^100x120 #example-id)"
 		html_image = '<img alt="alt text here" height="120" id="example-id" src="/example/picture.jpg" width="100">'
 		test_markdown_parser = HyperTextFromMarkdown.new(html_image, { 'html_img' => true }).results
@@ -74,6 +74,12 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		act = '<a href="https://drafts.csswg.org/mediaqueries-5/#descdef-media-prefers-reduced-data" title="Media Queries Level 5 Editor’s Draft, 21 November 2020">CSS prefers-reduced-data media-query</a>'
 		assert_equal_of_parser(md, act, false)
 	end
+
+	# def test_complex_link2
+	# 	md = "[Intel Extreme Masters (IEM)](https://twitter.com/search?q=Intel%20Extreme%20Masters%20IEM 'external')"
+	# 	act = '<a class="external" href="https://twitter.com/search?q=Intel%20Extreme%20Masters%20IEM">Intel Extreme Masters (IEM)</a>'
+	# 	assert_equal_of_parser(md, act, false)
+	# end
 
 	def test_emphesis
 		markdown = "*browsing* right now"

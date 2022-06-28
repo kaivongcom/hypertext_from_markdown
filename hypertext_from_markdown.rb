@@ -10,13 +10,13 @@ class HyperTextFromMarkdown < Object
 	NEW_LINE = "\n"
 
 	def initialize(markdown_text, attrs_hash={})
-		attrs_hash = { 'html_element' => attrs_hash } if String == attrs_hash.class
+		attrs_hash = (attr_element_name = attrs_hash; { 'html_element' => attr_element_name } ) if String == attrs_hash.class
 		if attrs_hash['html_img']
 			@results = markdown_from_markup(markdown_text, attrs_hash)
 		else
 			@attrs = make_attrs(attrs_hash)
-			@attrs[:element_name] = element_name = attrs_hash['html_element'] || attrs_hash['element_name']
 			@markdown_text = markdown_text.chomp
+			element_name = @attrs[:element_name]
 			element_name = find_element(element_name, @markdown_text) if element_name == nil
 			length = @markdown_text.scan(/\n/).count
 			markdown_searches(markdown_text)
@@ -26,13 +26,14 @@ class HyperTextFromMarkdown < Object
 	end
 
 	def make_attrs(attrs)
-		attrs_hash = {
-			:class => attrs['attr_class'],
-			:href => attrs['href'],
-			:id => attrs['attr_id'],
-			:role => attrs['role'],
-			:summary => attrs['summary'],
-			:title => attrs['link_title'] }
+		element_name = attrs['element_name'] || attrs['html_element']
+		attrs_hash = { :class => attrs['attr_class'],
+					   :element_name => element_name,
+					   :href => attrs['href'],
+					   :id => attrs['attr_id'],
+					   :role => attrs['role'],
+					   :summary => attrs['summary'],
+					   :title => attrs['link_title'] }
 	end
 
 	def markdown_from_markup(text, attrs)
@@ -179,6 +180,9 @@ class HyperTextFromMarkdown < Object
 	end
 
 	def find_links(markdown_text)
+		# potential_link = if markdown_text.include?(')](')
+		# 	markdown_text.split(')](')[1][0..-2]
+		# else
 		potential_link = markdown_text.split(")")[0]
 		potential_link = potential_link ? potential_link + ')' : markdown_text
 		link_matches = potential_link.match(/\[(.*)\]\((.*)\)/)
