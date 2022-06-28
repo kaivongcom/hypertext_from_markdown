@@ -25,15 +25,23 @@ class HyperTextFromMarkdown < Object
 		end
 	end
 
-	def make_attrs(attrs)
-		element_name = attrs['element_name'] || attrs['html_element']
-		attrs_hash = { :class => attrs['attr_class'],
-					   :element_name => element_name,
-					   :href => attrs['href'],
-					   :id => attrs['attr_id'],
-					   :role => attrs['role'],
-					   :summary => attrs['summary'],
-					   :title => attrs['link_title'] }
+	def make_attrs(attrs, table_row=false)
+		element_name = table_row if table_row != false
+		if table_row != false			
+			{ 'attr_class' => attrs[:class],
+		      'attr_id' => attrs[:id],
+		      'element_name' => table_row,
+		      'role' => attrs[:role] }
+		else
+			element_name = attrs['element_name'] || attrs['html_element']
+			{ :class => attrs['attr_class'],
+			   :element_name => element_name,
+			   :href => attrs['href'],
+			   :id => attrs['attr_id'],
+			   :role => attrs['role'],
+			   :summary => attrs['summary'],
+			   :title => attrs['link_title'] }
+		end
 	end
 
 	def markdown_from_markup(text, attrs)
@@ -114,12 +122,8 @@ class HyperTextFromMarkdown < Object
 
 	def table_html(arr, markdown)
 		arr.shift
+		attributes = make_attrs(@attrs, HTML_TABLE_ROW)
 		table_wrapper = (arr.shift == ' # ') ?  HTML_TABLE_HEADER : false
-		# table_element_partial = !element ? '' : START_TABLE + '<' + element + '>'
-		attributes = {'attr_class' => @attrs[:class],
-					  'attr_id' => @attrs[:id],
-					  'element_name' => HTML_TABLE_ROW,
-					  'role' => @attrs[:role]}
 		td_items = (arr.compact.collect { |item| parse_markdown(item.strip, HTML_TABLE_DATA) }.join)
 		html = table_row = parse_markdown(td_items, attributes)
 		if @attrs['element_name'] == HTML_TABLE || table_wrapper
