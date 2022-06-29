@@ -56,7 +56,7 @@ class HyperTextFromMarkdown < Object
 	def markdown_searches(md)
 		find_bold(md)
 		find_emphasis(md)
-		find_html_img(md); link_scan(md); find_list(md);
+		find_html_img(md); find_links(md); find_list(md);
 		# find_strong(md); 
 		find_tables(md)
 	end
@@ -183,29 +183,20 @@ class HyperTextFromMarkdown < Object
 		attrs
 	end
 
-	def link_scan(markdown_text)
+	def find_links(markdown_text)
 		# potential_link = if markdown_text.include?(')](')
 		# 	markdown_text.split(')](')[1][0..-2]
-		# end
-		if markdown_text.include?('[') &&  markdown_text.include?(')') && 
-			if digits_kept = markdown_text.match(/[\d]{1,4}/) && markdown_text.include?(')]')
-				markdown_text.gsub!("(#{digits_kept})",'')
-				link_matches = markdown_text.match(/\[(.*)\]\((.*)\)/)
-			else
-				potential_link = markdown_text.split(")")[0]
-				potential_link = potential_link ? potential_link + ')' : markdown_text
-				link_matches = potential_link.match(/\[(.*)\]\((.*)\)/)
-			end
-			if @element_name == 'a'
-				link_matches = { link_tag_name: @attrs[:element_name], href: @attrs[:href] }
-			end
-			link_html(markdown_text, link_matches) if link_matches
+		# else
+		potential_link = markdown_text.split(")")[0]
+		potential_link = potential_link ? potential_link + ')' : markdown_text
+		link_matches = potential_link.match(/\[(.*)\]\((.*)\)/)
+		if @element_name == 'a'
+			link_matches = { link_tag_name: @attrs[:element_name], href: @attrs[:href] }
 		end
+		link_html(markdown_text, link_matches) if link_matches
 	end
 
 	def link_html(text, match_data)
-		html_text, html_link = text.split(']')
-		html_text.gsub!('[','')
 		potential_link = text.split(")")[0]
 		potential_link = potential_link ? potential_link + ')' : text
 		full_link = potential_link.match(/\[(.*)\)/)[0]
@@ -217,7 +208,6 @@ class HyperTextFromMarkdown < Object
 		end
 		link_text = wrap_html({text: text}, 'a', attrs) + external_domain
 		@markdown_text.gsub!(full_link, link_text)
-		@markdown_text.gsub!('](/notes/)','') if @markdown_text.include?('/notes/')
 	end
 
 	def single_header_html(text)
@@ -268,7 +258,7 @@ class HyperTextFromMarkdown < Object
 
 	def wrap_html(obj, element_name, attrs)
 		text = obj[:text]
-		element_attrs = ''
+		element_attrs = String.new
 		['id', 'class', 'href', 'lang', 'role', 'summary', 'title'].each do |attr|
 			element_attrs += " #{attr}=" + sp_wrapper(attrs[attr.to_sym]) if attrs[attr.to_sym]
 		end

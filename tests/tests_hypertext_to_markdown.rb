@@ -314,12 +314,6 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		assert_equal_of_parser(md, html)
 	end
 
-	def test_link_in_notes
-		md = "this is a [notes (21)](/notes/) link, keeping a count!"
-		actual_expected = '<p>this is a <a href="/notes/">notes (21)</a> link, keeping a count!</p>'
-		assert_equal_of_parser(md, actual_expected)
-	end
-
 	def test_wrapped_in_text_link_paragraph
 		md = "here is [a example link](http://example.com/ ""With a Title"") to something else"
 		actual_expected = '<p>here is <a href="http://example.com/" title="With a Title">a example link</a> to something else</p>'
