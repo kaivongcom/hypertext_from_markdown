@@ -15,6 +15,13 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		assert_equal(markdown,test_markdown_parser)
 	end
 
+	def test_markdown_from_domain_to_markup
+		html = '<a href="https://www.kaivong.com/bio-link/">link</a>'
+ 		url_params = { 'user_resource_loc' => 'https://www.kaivong.com'}
+		test_domain_markdown =  HyperTextFromMarkdown.new("[link](/bio-link/)", url_params ).results
+		assert_equal(html, test_domain_markdown)
+	end
+
 	def test_for_lists
 		actual = "* example item in list"
 		assert_equal_of_parser(actual, '<li>example item in list</li>')
@@ -45,7 +52,6 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		html_link = '<a href="#example"><i class="bi bi-link-45deg" title="icon link"></i> <span class="link-text">(link)</span></a>'
 		assert_equal_of_parser(actual_expected, html_link, false)
 	end
-
 
 	def test_for_anchor_link_text_within_text
 		test = { markdown: 'Link to [Google](http://google.com)', html: 'Link to <a href="http://google.com">Google</a>' }
@@ -106,7 +112,8 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 
 	def test_for_external_links
 		actual_expected = "[home page](http://example.com/pages/index.html external)"
-		assert_equal_of_parser(actual_expected, '<a class="external" href="http://example.com/pages/index.html" title="external">home page</a> (http://example.com)', false)
+		html = '<a class="external" href="http://example.com/pages/index.html" title="external">home page</a> (http://example.com)'
+		assert_equal_of_parser(actual_expected, html, false)
 	end
 
 	def test_for_empty_space
@@ -231,10 +238,17 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		assert_equal_of_parser(paragraph, "<p>example text line for unstyled</p>")
 	end
 
+	def test_for_table_with_border
+		markdown = ' '
+		expected = '<table summary="" border="1"> </table>'
+		html = HyperTextFromMarkdown.new(markdown, {'element_name' => 'table', 'summary' => '', 'border' => '1' }).results
+		assert_equal(expected, html )
+	end
+
 	def test_for_table
 		markdown = ' '
-		expected = '<table summary=""> </table>'
-		html = HyperTextFromMarkdown.new(markdown, {'element_name' => 'table', 'summary' => '' }).results
+		expected = '<table> </table>'
+		html = HyperTextFromMarkdown.new(markdown, {'element_name' => 'table' }).results
 		assert_equal(expected, html )
 	end
 

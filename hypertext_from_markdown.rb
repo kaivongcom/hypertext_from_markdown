@@ -31,15 +31,20 @@ class HyperTextFromMarkdown < Object
 			{ 'attr_class' => attrs[:class],
 		      'attr_id' => attrs[:id],
 		      'element_name' => table_row,
-		      'role' => attrs[:role] }
+		      'role' => attrs[:role],
+		      'summary' => attrs[:summary],
+		      'user_resource_loc' => attrs[:user_resource_loc],
+		      'border' => attrs[:border] }
 		else
 			element_name = attrs['element_name'] || attrs['html_element']
 			{ :class => attrs['attr_class'],
+			   :user_resource_loc => attrs['user_resource_loc'],
 			   :element_name => element_name,
 			   :href => attrs['href'],
 			   :id => attrs['attr_id'],
 			   :role => attrs['role'],
 			   :summary => attrs['summary'],
+			   :border => attrs['border'],
 			   :title => attrs['link_title'] }
 		end
 	end
@@ -180,6 +185,7 @@ class HyperTextFromMarkdown < Object
 			attrs[:domain] = url.scheme  + '://' + url.host
 		end
 		attrs[:title] = title if (title.length > 1)
+		attrs[:href] = @attrs[:user_resource_loc] + attrs[:href] if @attrs[:user_resource_loc] != nil
 		attrs
 	end
 
@@ -197,6 +203,7 @@ class HyperTextFromMarkdown < Object
 				link_matches = potential_link.match(/\[(.*)\]\((.*)\)/)
 			end
 			if @element_name == 'a'
+# 				@attrs[:href] = @attrs[:user_resource_loc] + @attrs[:href] if (@attrs[:user_resource_loc])
 				link_matches = { link_tag_name: @attrs[:element_name], href: @attrs[:href] }
 			end
 			link_html(markdown_text, link_matches) if link_matches
@@ -269,7 +276,7 @@ class HyperTextFromMarkdown < Object
 	def wrap_html(obj, element_name, attrs)
 		text = obj[:text]
 		element_attrs = ''
-		['id', 'class', 'href', 'lang', 'role', 'summary', 'title'].each do |attr|
+		['id', 'class', 'href', 'lang', 'role', 'summary', 'border', 'title'].each do |attr|
 			element_attrs += " #{attr}=" + sp_wrapper(attrs[attr.to_sym]) if attrs[attr.to_sym]
 		end
 		if text.include?(NEW_LINE)
