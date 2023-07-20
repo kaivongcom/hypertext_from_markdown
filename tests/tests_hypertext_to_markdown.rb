@@ -15,6 +15,13 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		assert_equal(markdown,test_markdown_parser)
 	end
 
+	def test_markdown_from_domain_to_markup
+		html = '<a href="https://www.kaivong.com/bio-link/">link</a>'
+ 		url_params = { 'user_resource_loc' => 'https://www.kaivong.com'}
+		test_domain_markdown =  HyperTextFromMarkdown.new("[link](/bio-link/)", url_params ).results
+		assert_equal(html, test_domain_markdown)
+	end
+
 	def test_for_lists
 		actual = "* example item in list"
 		assert_equal_of_parser(actual, '<li>example item in list</li>')
@@ -45,7 +52,6 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		html_link = '<a href="#example"><i class="bi bi-link-45deg" title="icon link"></i> <span class="link-text">(link)</span></a>'
 		assert_equal_of_parser(actual_expected, html_link, false)
 	end
-
 
 	def test_for_anchor_link_text_within_text
 		test = { markdown: 'Link to [Google](http://google.com)', html: 'Link to <a href="http://google.com">Google</a>' }
@@ -106,7 +112,8 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 
 	def test_for_external_links
 		actual_expected = "[home page](http://example.com/pages/index.html external)"
-		assert_equal_of_parser(actual_expected, '<a class="external" href="http://example.com/pages/index.html" title="external">home page</a> (http://example.com)', false)
+		html = '<a class="external" href="http://example.com/pages/index.html" title="external">home page</a> (http://example.com)'
+		assert_equal_of_parser(actual_expected, html, false)
 	end
 
 	def test_for_empty_space
@@ -231,10 +238,17 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		assert_equal_of_parser(paragraph, "<p>example text line for unstyled</p>")
 	end
 
-	def test_for_table
+	def test_for_table_with_border
 		markdown = ' '
-		expected = '<table summary=""> </table>'
-		html = HyperTextFromMarkdown.new(markdown, {'element_name' => 'table', 'summary' => '' }).results
+		expected = '<table summary="" border="1"> </table>'
+		html = HyperTextFromMarkdown.new(markdown, {'element_name' => 'table', 'summary' => '', 'border' => '1' }).results
+		assert_equal(expected, html )
+	end
+
+	def test_for_table
+		markdown = String.new
+		expected = '<table></table>'
+		html = HyperTextFromMarkdown.new(markdown, {'element_name' => 'table' }).results
 		assert_equal(expected, html )
 	end
 
@@ -263,8 +277,8 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 
 	def test_for_table_wrapper # TODO: test with formatting
 		fragment_of_html = '<td class=name-1>bill</td><td class=name-2>bob</td><td class=name-3>jess</td>'
-		actual_expected = "<tr role=\"names\"><td class=name-1>bill</td><td class=name-2>bob</td><td class=name-3>jess</td></tr>"
 		html = HyperTextFromMarkdown.new(fragment_of_html, { 'element_name' => 'tr', 'role' => "names" }).results
+		actual_expected = "<tr role=\"names\"><td class=name-1>bill</td><td class=name-2>bob</td><td class=name-3>jess</td></tr>"
 		assert_equal(html, actual_expected)
 	end
 
@@ -312,6 +326,12 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		md = "here is **bold or strong text**"
 		html = '<p>here is <strong>bold or strong text</strong></p>'
 		assert_equal_of_parser(md, html)
+	end
+
+	def test_link_in_notes
+		md = "this is a [notes (21)](/notes/) link, keeping a count!"
+		actual_expected = '<p>this is a <a href="/notes/">notes (21)</a> link, keeping a count!</p>'
+		assert_equal_of_parser(md, actual_expected)
 	end
 
 	def test_wrapped_in_text_link_paragraph

@@ -1,13 +1,7 @@
 require 'uri'
+require_relative './hyper-text-helpers.rb'
 class HyperTextFromMarkdown < Object
 	attr_reader :results
-	CLOSE_TABLE = '</table>'
-	HTML_LIST_ITEM = 'li'
-	HTML_TABLE = 'table'
-	HTML_TABLE_DATA = 'td'
-	HTML_TABLE_HEADER = 'thead'
-	HTML_TABLE_ROW = 'tr'
-	NEW_LINE = "\n"
 
 	def initialize(markdown_text, attrs_hash={})
 		attrs_hash = (attr_element_name = attrs_hash; { 'html_element' => attr_element_name } ) if String == attrs_hash.class
@@ -31,15 +25,20 @@ class HyperTextFromMarkdown < Object
 			{ 'attr_class' => attrs[:class],
 		      'attr_id' => attrs[:id],
 		      'element_name' => table_row,
-		      'role' => attrs[:role] }
+		      'role' => attrs[:role],
+		      'summary' => attrs[:summary],
+		      'user_resource_loc' => attrs[:user_resource_loc],
+		      'border' => attrs[:border] }
 		else
 			element_name = attrs['element_name'] || attrs['html_element']
 			{ :class => attrs['attr_class'],
+			   :user_resource_loc => attrs['user_resource_loc'],
 			   :element_name => element_name,
 			   :href => attrs['href'],
 			   :id => attrs['attr_id'],
 			   :role => attrs['role'],
 			   :summary => attrs['summary'],
+			   :border => attrs['border'],
 			   :title => attrs['link_title'] }
 		end
 	end
@@ -56,7 +55,7 @@ class HyperTextFromMarkdown < Object
 	def markdown_searches(md)
 		find_bold(md)
 		find_emphasis(md)
-		find_html_img(md); find_links(md); find_list(md);
+		find_html_img(md); link_scan(md); find_list(md);
 		# find_strong(md); 
 		find_tables(md)
 	end
@@ -180,23 +179,34 @@ class HyperTextFromMarkdown < Object
 			attrs[:domain] = url.scheme  + '://' + url.host
 		end
 		attrs[:title] = title if (title.length > 1)
+		attrs[:href] = @attrs[:user_resource_loc] + attrs[:href] if @attrs[:user_resource_loc] != nil
 		attrs
 	end
 
-	def find_links(markdown_text)
+	def link_scan(markdown_text)
 		# potential_link = if markdown_text.include?(')](')
 		# 	markdown_text.split(')](')[1][0..-2]
-		# else
-		potential_link = markdown_text.split(")")[0]
-		potential_link = potential_link ? potential_link + ')' : markdown_text
-		link_matches = potential_link.match(/\[(.*)\]\((.*)\)/)
-		if @element_name == 'a'
-			link_matches = { link_tag_name: @attrs[:element_name], href: @attrs[:href] }
+		# end
+		if markdown_text.include?('[') &&  markdown_text.include?(')') && 
+			if digits_kept = markdown_text.match(/[\d]{1,4}/) && markdown_text.include?(')]')
+				markdown_text.gsub!("(#{digits_kept})",'')
+				link_matches = markdown_text.match(/\[(.*)\]\((.*)\)/)
+			else
+				potential_link = markdown_text.split(")")[0]
+				potential_link = potential_link ? potential_link + ')' : markdown_text
+				link_matches = potential_link.match(/\[(.*)\]\((.*)\)/)
+			end
+			if @element_name == 'a'
+# 				@attrs[:href] = @attrs[:user_resource_loc] + @attrs[:href] if (@attrs[:user_resource_loc])
+				link_matches = { link_tag_name: @attrs[:element_name], href: @attrs[:href] }
+			end
+			link_html(markdown_text, link_matches) if link_matches
 		end
-		link_html(markdown_text, link_matches) if link_matches
 	end
 
 	def link_html(text, match_data)
+		html_text, html_link = text.split(']')
+		html_text.gsub!('[','')
 		potential_link = text.split(")")[0]
 		potential_link = potential_link ? potential_link + ')' : text
 		full_link = potential_link.match(/\[(.*)\)/)[0]
@@ -208,6 +218,7 @@ class HyperTextFromMarkdown < Object
 		end
 		link_text = wrap_html({text: text}, 'a', attrs) + external_domain
 		@markdown_text.gsub!(full_link, link_text)
+		@markdown_text.gsub!('](/notes/)','') if @markdown_text.include?('/notes/')
 	end
 
 	def single_header_html(text)
@@ -258,8 +269,8 @@ class HyperTextFromMarkdown < Object
 
 	def wrap_html(obj, element_name, attrs)
 		text = obj[:text]
-		element_attrs = String.new
-		['id', 'class', 'href', 'lang', 'role', 'summary', 'title'].each do |attr|
+		element_attrs = ''
+		['id', 'class', 'href', 'lang', 'role', 'summary', 'border', 'title'].each do |attr|
 			element_attrs += " #{attr}=" + sp_wrapper(attrs[attr.to_sym]) if attrs[attr.to_sym]
 		end
 		if text.include?(NEW_LINE)
