@@ -246,8 +246,8 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 	end
 
 	def test_for_table
-		markdown = ' '
-		expected = '<table> </table>'
+		markdown = String.new
+		expected = '<table></table>'
 		html = HyperTextFromMarkdown.new(markdown, {'element_name' => 'table' }).results
 		assert_equal(expected, html )
 	end
@@ -277,8 +277,8 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 
 	def test_for_table_wrapper # TODO: test with formatting
 		fragment_of_html = '<td class=name-1>bill</td><td class=name-2>bob</td><td class=name-3>jess</td>'
-		actual_expected = "<tr role=\"names\"><td class=name-1>bill</td><td class=name-2>bob</td><td class=name-3>jess</td></tr>"
 		html = HyperTextFromMarkdown.new(fragment_of_html, { 'element_name' => 'tr', 'role' => "names" }).results
+		actual_expected = "<tr role=\"names\"><td class=name-1>bill</td><td class=name-2>bob</td><td class=name-3>jess</td></tr>"
 		assert_equal(html, actual_expected)
 	end
 

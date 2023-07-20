@@ -1,13 +1,7 @@
 require 'uri'
+require_relative './hyper-text-helpers.rb'
 class HyperTextFromMarkdown < Object
 	attr_reader :results
-	CLOSE_TABLE = '</table>'
-	HTML_LIST_ITEM = 'li'
-	HTML_TABLE = 'table'
-	HTML_TABLE_DATA = 'td'
-	HTML_TABLE_HEADER = 'thead'
-	HTML_TABLE_ROW = 'tr'
-	NEW_LINE = "\n"
 
 	def initialize(markdown_text, attrs_hash={})
 		attrs_hash = (attr_element_name = attrs_hash; { 'html_element' => attr_element_name } ) if String == attrs_hash.class
