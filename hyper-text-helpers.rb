@@ -10,8 +10,8 @@ def	html_body(body_content, styles)
 	"<html><head>#{ styles }</head><body>#{body_content}</body></html>"
 end
 
-def	html_table(contents)
-	"<table><tbody>\n #{contents} </tbody></table>"
+def	html_table(content)
+	"<table><tbody>\n #{content} </tbody></table>"
 end
 
 def html_table_data(class_name, displaying, data)
