@@ -1,4 +1,4 @@
-CLOSE_TABLE = '</table>'
+END_TABLE = '</table>'
 HTML_LIST_ITEM = 'li'
 HTML_TABLE = 'table'
 HTML_TABLE_DATA = 'td'
@@ -11,7 +11,7 @@ def	html_body(body_content, styles)
 end
 
 def	html_table(content)
-	"<table><tbody>\n #{content} </tbody>"+CLOSE_TABLE
+	"<table><tbody>\n #{content} </tbody>"+END_TABLE
 end
 
 def html_table_data(class_name, displaying, data)

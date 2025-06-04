@@ -128,7 +128,7 @@ class HyperTextFromMarkdown < Object
 		if @attrs['element_name'] == HTML_TABLE || table_wrapper
 			table_head = parse_markdown(table_row, { 'element_name' => HTML_TABLE_HEADER })
 			html = parse_markdown(table_head, { 'element_name' => HTML_TABLE, 'summary' => '' })
-			html = html.gsub(CLOSE_TABLE,'')
+			html = html.gsub(END_TABLE,'')
 		end
 		@markdown_text.gsub!(markdown, html)
 	end
