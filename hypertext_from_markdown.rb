@@ -1,5 +1,5 @@
 require 'uri'
-require_relative './hyper-text-helpers.rb'
+require_relative './helpers/hyper-text-helpers.rb'
 class HyperTextFromMarkdown < Object
 	attr_reader :results
 
