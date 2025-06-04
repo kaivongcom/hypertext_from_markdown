@@ -11,7 +11,7 @@ def	html_body(body_content, styles)
 end
 
 def	html_table(content)
-	"<table><tbody>\n #{content} </tbody></table>"
+	"<table><tbody>\n #{content} </tbody>"+CLOSE_TABLE
 end
 
 def html_table_data(class_name, displaying, data)
