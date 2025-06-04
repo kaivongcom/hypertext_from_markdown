@@ -1,5 +1,5 @@
 !# /usr/bin/ruby
-require_relative "./hypertext_from_markdown.rb"
+require_relative "./libs/hypertext_from_markdown.rb"
 
 class FromMarkDown
 
