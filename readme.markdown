@@ -1,4 +1,4 @@
-this project is available, however recommendations @ (microsoft markitdown)[https://github.com/microsoft/markitdown] alternative (python programming language)
+recommendations @ (microsoft markitdown)[https://github.com/microsoft/markitdown] alternative (python programming language)
 
 # HTML from MarkDown
 
