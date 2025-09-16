@@ -27,7 +27,7 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		assert_equal_of_parser(actual, '<li>example item in list</li>')
 	end
 
-	def test_for_lists_with_additional_html # find some kind of err ... from ascii or otherwise? eg. * Dressipi <small>&#x28;https://www.dressipi.com&#x29;</small>
+	def test_for_lists_with_additional_html 
 		actual = "* example item <small>in list</small>"
 		assert_equal_of_parser(actual, '<li>example item <small>in list</small></li>')
 	end
