@@ -1,14 +1,22 @@
 require "test/unit"
 require_relative "../libs/hypertext_from_markdown"
 
+BLANK_SPACER = " "
+
 class TestHyperTextFromMarkdown < Test::Unit::TestCase
 	def assert_equal_of_parser(original, html, wrapper_element=true, attr_class=false, attr_id=false, link_title=false)
 		attrs = { "element_name" => wrapper_element, "class" => attr_class, "link_title" => link_title, "id" => attr_id }
 		actual_expected, expected = HyperTextFromMarkdown.new(original, attrs).results, html
 		assert_equal(expected, actual_expected)
 	end
+    
+    def test_for_paragraph_text_of_my_own
+        paragraph = "example text we might get" + BLANK_SPACER
+        html = '<p>'+paragraph+'</p>'
+        assert_equal(html, HyperTextFromMarkdown.new(paragraph).results)
+    end
 
-	def test_markdown_from_a_MARKUP # image markup to markdown
+    def test_markdown_from_a_MARKUP # image markup to markdown
 		markdown = "![alt text here](/example/picture.jpg^100x120 #example-id)"
 		html_image = '<img alt="alt text here" height="120" id="example-id" src="/example/picture.jpg" width="100">'
 		test_markdown_parser = HyperTextFromMarkdown.new(html_image, { 'html_img' => true }).results
