@@ -8,7 +8,7 @@ A personal ruby project for changing markdown-text into hypertext (markup langua
 
 The ruby-prog files are going to change in the future to help note the better parts of the Hyper-Text/MD language. New helpers can be found in other projects.
 
-**Help** can be found in other projects/repositories, you could look at kramdown for this... but your choice. 
+Help can be found in other projects/repositories. Try looking at kramdown? Github also has issues 🤷
 <!--
 ## note
 this could be useful based on seen:
