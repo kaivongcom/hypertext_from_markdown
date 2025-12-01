@@ -86,8 +86,8 @@ class HyperTextFromMarkdown < Object
 		if src.include?('^')
 			src, dimensions = src.split('^')
 			width, height = dimensions.split('x')
-      height = " height=""%s"" " % height
-      width = " width=""%s""" % width
+            height = ' height="' + height + '" '
+            width = ' width="' + width + '"'
 		end
 		attrs = ""
 		image = "<img alt=\"#{matches[1]}\""+ height + "id=\"#{id}\" loading=\"eager\" src=\"#{src}\"" + width+ ">"
