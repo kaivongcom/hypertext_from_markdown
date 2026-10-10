@@ -95,7 +95,10 @@ class HyperTextFromMarkdown < Object
 	end
 
 	def find_list(markdown_text)
-		matches = markdown_text.match(/^\*\s(.*)/)
+        matches = markdown_text.match(/^\*\s(.*)/)
+        unless matches
+            matches = markdown_text.match(/^\-\s(.*)/)
+        end
 		html_list(matches) if matches
 	end
 

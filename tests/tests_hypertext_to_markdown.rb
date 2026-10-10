@@ -35,6 +35,11 @@ class TestHyperTextFromMarkdown < Test::Unit::TestCase
 		assert_equal_of_parser(actual, '<li>example item in list</li>')
 	end
 
+	def test_for_alternate_md_list
+		actual = "- example item in list"
+		assert_equal_of_parser(actual, '<li>example item in list</li>')
+	end
+
 	def test_for_lists_with_additional_html 
 		actual = "* example item <small>in list</small>"
 		assert_equal_of_parser(actual, '<li>example item <small>in list</small></li>')
